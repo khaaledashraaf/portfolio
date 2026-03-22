@@ -80,7 +80,7 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
                 playsInline
                 className="w-30 h-30 object-contain"
               >
-                <source src="/animations/sun.mp4" type="video/mp4" />
+                <source src="/animations/sun-compressed.mp4" type="video/mp4" />
               </video>
             )}
           </motion.div>
