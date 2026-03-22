@@ -23,15 +23,15 @@ export function FeaturedSticker({ findId, stickerType }: { findId: string; stick
 
   return (
     <div
-      className="absolute -top-3 -right-2 z-10 animate-wobble"
+      className="absolute -top-2 -right-2 z-10 animate-wobble"
       style={{ "--wobble-angle": `${rotation}deg` } as React.CSSProperties}
     >
       <Image
         src={sticker.src}
         alt={sticker.alt}
-        width={36}
-        height={36}
-        className="pointer-events-none"
+        width={28}
+        height={28}
+        className="pointer-events-none [filter:drop-shadow(1.25px_0_0_white)_drop-shadow(-1.25px_0_0_white)_drop-shadow(0_1.25px_0_white)_drop-shadow(0_-1.25px_0_white)_drop-shadow(1.25px_1.25px_0_white)_drop-shadow(-1.25px_1.25px_0_white)_drop-shadow(1.25px_-1.25px_0_white)_drop-shadow(-1.25px_-1.25px_0_white)_drop-shadow(0_1px_2px_rgba(0,0,0,0.15))]"
       />
     </div>
   );
