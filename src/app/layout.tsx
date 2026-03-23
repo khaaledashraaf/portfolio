@@ -5,6 +5,7 @@ import { LoadingProvider } from "@/components/loading-screen";
 import { Navbar } from "@/components/navbar";
 import { SiteChrome } from "@/components/site-chrome";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -66,6 +67,7 @@ export default function RootLayout({
           </LoadingProvider>
         </ThemeProvider>
         <GoogleAnalytics gaId="G-LCV0P4FHDY" />
+        <Analytics />
       </body>
     </html>
   );
