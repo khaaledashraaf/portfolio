@@ -22,7 +22,7 @@ export function Footer({ light = false, showAscii = true }: { light?: boolean; s
           <div className={`flex flex-col items-center justify-between gap-4 text-sm sm:flex-row ${light ? "text-white/60" : "text-foreground/80"}`}>
             <div className={`flex items-center gap-2 ${light ? "text-white/80" : ""}`}>
               <span>© {new Date().getFullYear()} Khaled Ashraf</span>
-              <span className="text-white/40 dark:text-foreground/40">·</span>
+              <span className="text-foreground/40 dark:text-white/40">·</span>
               <a href="/privacy" className={`transition-colors ${light ? "text-white/40 hover:text-white/60" : "text-foreground/40 hover:text-foreground/60"}`}>Privacy</a>
             </div>
             <div className="flex gap-4">
