@@ -108,7 +108,7 @@ interface CardWrapperProps {
   className?: string;
   children: React.ReactNode;
   isSelected?: boolean;
-  onInspect?: () => void;
+  onInspect?: (rect: DOMRect) => void;
 }
 
 function CardWrapper({ find, className, children, isSelected, onInspect }: CardWrapperProps) {
@@ -139,7 +139,14 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
   if (isFeatured) {
     return (
       <motion.div
-        onClick={onInspect}
+        onClick={(e) => {
+          if (onInspect) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            // Compensate for the whileHover y offset — the card is lifted -6px when clicked
+            const adjusted = new DOMRect(rect.x, rect.y + 6, rect.width, rect.height);
+            onInspect(adjusted);
+          }
+        }}
         whileHover={{ y: -6 }}
         transition={{ type: "tween", duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
@@ -204,7 +211,7 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
   );
 }
 
-function PoetryCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function PoetryCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const s = getPriority(find);
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect}>
@@ -223,7 +230,7 @@ function PoetryCard({ find, isSelected, onInspect }: { find: Find; isSelected?: 
   );
 }
 
-function MovieCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function MovieCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const s = getPriority(find);
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
@@ -250,7 +257,7 @@ function MovieCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
   );
 }
 
-function BookCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function BookCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const s = getPriority(find);
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="bg-amber-100/20 dark:bg-amber-500/[0.04]">
@@ -269,7 +276,7 @@ function BookCard({ find, isSelected, onInspect }: { find: Find; isSelected?: bo
   );
 }
 
-function ReelCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function ReelCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
@@ -296,7 +303,7 @@ function ReelCard({ find, isSelected, onInspect }: { find: Find; isSelected?: bo
   );
 }
 
-function VideoCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function VideoCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
@@ -336,7 +343,7 @@ function VideoCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
   );
 }
 
-function ArticleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function ArticleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const s = getPriority(find);
   const hasCover = find.coverVideoUrl || find.imageUrl;
   return (
@@ -382,7 +389,7 @@ function ArticleCard({ find, isSelected, onInspect }: { find: Find; isSelected?:
   );
 }
 
-function MusicCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function MusicCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const s = getPriority(find);
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="bg-violet-100/20 dark:bg-violet-500/[0.04]">
@@ -401,7 +408,7 @@ function MusicCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
   );
 }
 
-function ImageCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function ImageCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
@@ -423,7 +430,7 @@ function ImageCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
   );
 }
 
-function ToolCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function ToolCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const s = getPriority(find);
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="bg-emerald-100/20 dark:bg-emerald-500/[0.04] overflow-hidden">
@@ -453,7 +460,7 @@ function ToolCard({ find, isSelected, onInspect }: { find: Find; isSelected?: bo
   );
 }
 
-function PeopleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function PeopleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const s = getPriority(find);
   const hasCover = find.imageUrl;
   return (
@@ -481,7 +488,7 @@ function PeopleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: 
   );
 }
 
-function OtherCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+function OtherCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const s = getPriority(find);
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect}>
@@ -497,7 +504,7 @@ function OtherCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
   );
 }
 
-const cardMap: Record<Find["type"], React.ComponentType<{ find: Find; isSelected?: boolean; onInspect?: () => void }>> = {
+const cardMap: Record<Find["type"], React.ComponentType<{ find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }>> = {
   movie: MovieCard,
   book: BookCard,
   reel: ReelCard,
@@ -511,7 +518,7 @@ const cardMap: Record<Find["type"], React.ComponentType<{ find: Find; isSelected
   other: OtherCard,
 };
 
-export function FindCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
+export function FindCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: (rect: DOMRect) => void }) {
   const Card = cardMap[find.type];
   return <Card find={find} isSelected={isSelected} onInspect={onInspect} />;
 }

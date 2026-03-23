@@ -166,6 +166,8 @@ export function FindsGrid({ items, types }: FindsGridProps) {
   const [activeType, setActiveType] = useState<FindType | null>(null);
   const [view, setView] = useState<ViewMode>("grid");
   const [selectedFind, setSelectedFind] = useState<Find | null>(null);
+  const [selectedRect, setSelectedRect] = useState<DOMRect | null>(null);
+  const [closing, setClosing] = useState(false);
   const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set());
 
   const [colCount, setColCount] = useState(3);
@@ -239,7 +241,7 @@ export function FindsGrid({ items, types }: FindsGridProps) {
       <FindCard
         find={findItem}
         isSelected={selectedFind?.id === findItem.id}
-        onInspect={findItem.featured ? () => setSelectedFind(findItem) : undefined}
+        onInspect={findItem.featured ? (rect: DOMRect) => { setSelectedRect(rect); setSelectedFind(findItem); } : undefined}
       />
     );
   }
@@ -361,12 +363,19 @@ export function FindsGrid({ items, types }: FindsGridProps) {
         <p className="text-muted-foreground">No finds yet in this category.</p>
       )}
 
-      <AnimatePresence>
-        {selectedFind && (
+      <AnimatePresence
+        onExitComplete={() => {
+          setSelectedFind(null);
+          setSelectedRect(null);
+          setClosing(false);
+        }}
+      >
+        {selectedFind && !closing && (
           <FindDetailOverlay
             find={selectedFind}
             allFinds={allFinds}
-            onClose={() => setSelectedFind(null)}
+            originRect={selectedRect}
+            onClose={() => setClosing(true)}
           />
         )}
       </AnimatePresence>
