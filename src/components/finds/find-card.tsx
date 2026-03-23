@@ -409,7 +409,7 @@ function ArticleCard({ find, isSelected, onInspect }: { find: Find; isSelected?:
             <span className="text-xs ml-auto">{extractDomain(find.sourceUrl)}</span>
           )}
         </div>
-        <h3 className={cn("font-semibold text-foreground group-hover:underline", s.title)}>
+        <h3 className={cn("font-semibold text-foreground ", s.title)}>
           {find.title}
         </h3>
         {find.author && (
