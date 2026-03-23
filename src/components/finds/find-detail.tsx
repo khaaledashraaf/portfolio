@@ -16,11 +16,11 @@ interface FindDetailOverlayProps {
 
 // Scattered positions around the center card (px offsets from viewport center)
 const CARD_POSITIONS = [
-  { x: -320, y: -80 },
-  { x: 300, y: -60 },
-  { x: -300, y: 180 },
-  { x: 320, y: 160 },
-  { x: -160, y: -220 },
+  { x: -340, y: -100 },
+  { x: 280, y: -120 },
+  { x: -320, y: 200 },
+  { x: 300, y: 180 },
+  { x: 280, y: 40 },
 ];
 
 function MiniCard({ card }: { card: ExpandedCard }) {

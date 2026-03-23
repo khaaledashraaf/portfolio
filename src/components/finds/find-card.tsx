@@ -137,6 +137,25 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
   ) : null;
 
   if (isFeatured) {
+    const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+
+    if (isMobile) {
+      return (
+        <a
+          href={find.sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={sharedClassName}
+        >
+          {find.sticker && <FeaturedSticker findId={find.id} stickerType={find.sticker} />}
+          <div className="relative overflow-hidden rounded-2xl">
+            {children}
+            {submittedByTag}
+          </div>
+        </a>
+      );
+    }
+
     return (
       <motion.div
         onClick={(e) => {
