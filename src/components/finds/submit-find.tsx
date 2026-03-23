@@ -235,16 +235,18 @@ export function SubmitFindButton() {
       <motion.button
         onClick={() => setOpen(true)}
         className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium",
+          "inline-flex items-center justify-center rounded-lg",
+          "h-8 w-8 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-1.5 sm:text-sm sm:font-medium",
           "bg-white text-muted-foreground border border-border/50",
           "dark:bg-white/10 dark:text-white/70 dark:border-white/10",
           "hover:text-foreground hover:border-border dark:hover:text-white dark:hover:border-white/20 transition-colors"
         )}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
+        title="Submit a find"
       >
-        <Plus className="h-3.5 w-3.5" />
-        Submit a find
+        <Plus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+        <span className="hidden sm:inline">Submit a find</span>
       </motion.button>
 
       <AnimatePresence>

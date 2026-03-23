@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { AsciiBackground } from "./ascii-background";
 import { Footer } from "./footer";
 import { LyingCharacter } from "./lying-character";
@@ -22,6 +23,17 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       </main>
       <div className="relative">
         {showFooterExtras && <LyingCharacter className={isProjects ? "hidden sm:flex" : ""} />}
+        {isFinds && (
+          <div className="flex justify-center sm:absolute sm:bottom-0 sm:left-1/2 sm:-translate-x-1/2">
+            <Image
+              src="/me_fascinated.png"
+              alt=""
+              width={220}
+              height={220}
+              className="opacity-80 dark:invert"
+            />
+          </div>
+        )}
         <Footer light={isAbout} showAscii={showFooterExtras} />
       </div>
     </div>
