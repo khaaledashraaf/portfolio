@@ -53,7 +53,7 @@ export function FindDetailOverlay({
   const ty = (vh - oh) / 2;
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-50" style={{ perspective: "1200px" }}>
       {/* Backdrop */}
       <motion.div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -82,20 +82,23 @@ export function FindDetailOverlay({
         initial={{
           left: ox,
           top: oy,
+          rotateY: 0,
+          rotateX: 0,
         }}
         animate={{
           left: tx,
           top: ty,
+          rotateY: 360,
         }}
         exit={{
           left: ox,
           top: oy,
+          rotateY: 0,
         }}
         transition={{
-          type: "spring",
-          stiffness: 200,
-          damping: 26,
-          mass: 0.8,
+          left: { type: "spring", stiffness: 200, damping: 26, mass: 0.8 },
+          top: { type: "spring", stiffness: 200, damping: 26, mass: 0.8 },
+          rotateY: { type: "tween", duration: 0.8, ease: [0.22, 1, 0.36, 1] },
         }}
         onAnimationComplete={() => setLanded(true)}
       >
