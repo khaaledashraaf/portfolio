@@ -23,7 +23,7 @@ export function FeaturedSticker({ findId, stickerType }: { findId: string; stick
 
   return (
     <div
-      className="absolute -top-2 -right-2 z-10 animate-wobble"
+      className="absolute top-2 right-2 z-10 animate-wobble"
       style={{ "--wobble-angle": `${rotation}deg` } as React.CSSProperties}
     >
       <Image

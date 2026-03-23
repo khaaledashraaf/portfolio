@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useRef, useCallback, useState } from "react";
 import type { Find } from "@/content/finds";
 import { cn } from "@/lib/utils";
 import { FeaturedSticker } from "./pixel-stickers";
@@ -17,6 +18,72 @@ import {
   Wrench,
   User,
 } from "lucide-react";
+
+function useCardEffects(featured?: boolean) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [hovering, setHovering] = useState(false);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      el.style.setProperty("--mouse-x", `${x}px`);
+      el.style.setProperty("--mouse-y", `${y}px`);
+      if (featured) {
+        // Normalize to -1..1 for tilt
+        const nx = (x / rect.width) * 2 - 1;
+        const ny = (y / rect.height) * 2 - 1;
+        const tiltX = ny * -8; // tilt around X axis (vertical mouse = horizontal tilt)
+        const tiltY = nx * 8;  // tilt around Y axis
+        el.style.setProperty("--tilt-x", `${tiltX}deg`);
+        el.style.setProperty("--tilt-y", `${tiltY}deg`);
+      }
+    },
+    [featured]
+  );
+
+  const handleMouseEnter = useCallback(() => setHovering(true), []);
+  const handleMouseLeave = useCallback(() => {
+    setHovering(false);
+    const el = ref.current;
+    if (el && featured) {
+      el.style.setProperty("--tilt-x", "0deg");
+      el.style.setProperty("--tilt-y", "0deg");
+    }
+  }, [featured]);
+
+  return { ref, hovering, handleMouseMove, handleMouseEnter, handleMouseLeave };
+}
+
+function SpotlightOverlay({ hovering }: { hovering: boolean }) {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-10 rounded-2xl transition-opacity duration-500"
+      style={{
+        opacity: hovering ? 0.6 : 0,
+        background:
+          "radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.12), transparent 70%)",
+      }}
+    />
+  );
+}
+
+function GlareOverlay({ hovering }: { hovering: boolean }) {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-10 rounded-2xl transition-opacity duration-500"
+      style={{
+        opacity: hovering ? 0.65 : 0,
+        background:
+          "linear-gradient(130deg, transparent 10%, rgba(200,180,255,0.13) 22%, rgba(140,220,255,0.14) 30%, rgba(180,255,230,0.12) 38%, rgba(255,240,180,0.10) 46%, rgba(255,200,180,0.12) 54%, rgba(220,180,255,0.14) 62%, rgba(140,200,255,0.12) 70%, rgba(180,240,220,0.10) 78%, transparent 90%)",
+        mixBlendMode: "color-dodge",
+      }}
+    />
+  );
+}
 
 function extractDomain(url: string): string {
   try {
@@ -47,6 +114,8 @@ interface CardWrapperProps {
 function CardWrapper({ find, className, children, isSelected, onInspect }: CardWrapperProps) {
   const p = find.priority ?? 1;
   const isFeatured = find.featured && onInspect;
+  const { ref, hovering, handleMouseMove, handleMouseEnter, handleMouseLeave } =
+    useCardEffects(!!isFeatured);
 
   const sharedClassName = cn(
     "group relative block break-inside-avoid",
@@ -78,18 +147,33 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
           p === 3 && "column-span-all",
           isSelected && "invisible",
         )}
+        style={{ perspective: "800px" }}
       >
-        {find.sticker && <FeaturedSticker findId={find.id} stickerType={find.sticker} />}
-        <div className={cn(
-          "rounded-2xl backdrop-blur-xl overflow-hidden",
-          "bg-gradient-to-br from-white/60 via-white/40 to-white/20 dark:from-white/[0.08] dark:via-white/[0.04] dark:to-white/[0.01]",
-          "shadow-[0_8px_32px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-1px_0_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(255,255,255,0.02)]",
-          "border border-white/40 dark:border-white/[0.08]",
-          "hover:shadow-[0_12px_40px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.7),inset_0_-1px_0_rgba(0,0,0,0.04)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(255,255,255,0.03)]",
-          className
-        )}>
-          {children}
-          {submittedByTag}
+        <div
+          ref={ref}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          className={cn(
+            "relative rounded-2xl backdrop-blur-xl overflow-visible transition-transform duration-200 ease-out",
+            "bg-gradient-to-br from-white/60 via-white/40 to-white/20 dark:from-white/[0.08] dark:via-white/[0.04] dark:to-white/[0.01]",
+            "shadow-[0_8px_32px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-1px_0_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(255,255,255,0.02)]",
+            "border border-white/40 dark:border-white/[0.08]",
+            "hover:shadow-[0_12px_40px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.7),inset_0_-1px_0_rgba(0,0,0,0.04)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(255,255,255,0.03)]",
+            className
+          )}
+          style={{
+            transform: "rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))",
+            transformStyle: "preserve-3d",
+          }}
+        >
+          {find.sticker && <FeaturedSticker findId={find.id} stickerType={find.sticker} />}
+          <div className="relative overflow-hidden rounded-2xl">
+            <SpotlightOverlay hovering={hovering} />
+            <GlareOverlay hovering={hovering} />
+            {children}
+            {submittedByTag}
+          </div>
         </div>
       </motion.div>
     );
@@ -98,17 +182,25 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
   const isInteractive = !!find.sourceUrl;
   const Comp = isInteractive ? motion.a : motion.div;
   return (
-    <Comp
-      {...(find.sourceUrl
-        ? { href: find.sourceUrl, target: "_blank", rel: "noopener noreferrer" }
-        : {})}
-      whileHover={{ y: isInteractive ? -4 : -2 }}
-      transition={{ type: "tween", duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className={sharedClassName}
+    <div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {children}
-      {submittedByTag}
-    </Comp>
+      <Comp
+        {...(find.sourceUrl
+          ? { href: find.sourceUrl, target: "_blank", rel: "noopener noreferrer" }
+          : {})}
+        whileHover={{ y: isInteractive ? -4 : -2 }}
+        transition={{ type: "tween", duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className={sharedClassName}
+      >
+        <SpotlightOverlay hovering={hovering} />
+        {children}
+        {submittedByTag}
+      </Comp>
+    </div>
   );
 }
 
