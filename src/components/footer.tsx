@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 
 export function Footer({ light = false, showAscii = true }: { light?: boolean; showAscii?: boolean }) {
@@ -24,6 +26,7 @@ export function Footer({ light = false, showAscii = true }: { light?: boolean; s
                 href="https://github.com/khaaledashraaf"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => window.gtag?.("event", "outbound_click", { link: "github" })}
                 className={`transition-colors ${light ? "hover:text-white" : "hover:text-foreground"}`}
               >
                 GitHub
@@ -32,6 +35,7 @@ export function Footer({ light = false, showAscii = true }: { light?: boolean; s
                 href="https://www.linkedin.com/in/khaledaelmaleh/"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => window.gtag?.("event", "outbound_click", { link: "linkedin" })}
                 className={`transition-colors ${light ? "hover:text-white" : "hover:text-foreground"}`}
               >
                 LinkedIn

@@ -20,12 +20,14 @@ export function EmailCTA() {
     await navigator.clipboard.writeText(email);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    window.gtag?.("event", "email_copy", { method: "clipboard" });
   };
 
   return (
     <div className="flex items-center h-10 rounded-lg border bg-background shadow-xs overflow-hidden">
       <a
         href={mailtoLink}
+        onClick={() => window.gtag?.("event", "email_click", { method: "mailto" })}
         className="flex-1 px-3 text-sm hover:underline underline-offset-2 flex items-center gap-2"
       >
         <Mail className="size-4 text-muted-foreground" />
