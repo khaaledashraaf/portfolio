@@ -78,7 +78,7 @@ export const finds: Find[] = [
     id: "5",
     title: "Susan Kare",
     type: "people",
-    note: 'Known as "The woman who gave Macintosh a smile", she was the pioneering designer working with Apple in the early 1980s to create the visual language of the first Macintosh. She designed some famous pixel-arts like "Happy Mac", the Command key symbol (⌘), and the "hello" text animation you see when you use a new Apple product.',
+    note: 'Known as "the woman who gave Macintosh a smile", she created "Happy Mac", the Command key symbol (⌘), and the "hello" text animation you see on every new Apple product.',
     sourceUrl: "https://vimeo.com/97583369",
     imageUrl: "https://www.mac-history.net/wp-content/uploads/2022/12/Susan-Kare.jpg",
     dateAdded: "2026-03-21",

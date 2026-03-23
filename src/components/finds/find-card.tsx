@@ -49,7 +49,7 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
   const isFeatured = find.featured && onInspect;
 
   const sharedClassName = cn(
-    "group relative block break-inside-avoid mb-4",
+    "group relative block break-inside-avoid",
     "rounded-2xl backdrop-blur-xl",
     "bg-gradient-to-br from-white/60 via-white/40 to-white/20 dark:from-white/[0.08] dark:via-white/[0.04] dark:to-white/[0.01]",
     "shadow-[0_8px_32px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-1px_0_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(255,255,255,0.02)]",
@@ -71,10 +71,10 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
     return (
       <motion.div
         onClick={onInspect}
-        whileHover={{ y: -8 }}
+        whileHover={{ y: -6 }}
         transition={{ type: "tween", duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
-          "group relative block break-inside-avoid mb-4 cursor-pointer overflow-visible",
+          "group relative block break-inside-avoid cursor-pointer overflow-visible",
           p === 3 && "column-span-all",
           isSelected && "invisible",
         )}
@@ -95,13 +95,14 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
     );
   }
 
-  const Comp = find.sourceUrl ? motion.a : motion.div;
+  const isInteractive = !!find.sourceUrl;
+  const Comp = isInteractive ? motion.a : motion.div;
   return (
     <Comp
       {...(find.sourceUrl
         ? { href: find.sourceUrl, target: "_blank", rel: "noopener noreferrer" }
         : {})}
-      whileHover={{ y: -8 }}
+      whileHover={{ y: isInteractive ? -4 : -2 }}
       transition={{ type: "tween", duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       className={sharedClassName}
     >
@@ -115,7 +116,7 @@ function PoetryCard({ find, isSelected, onInspect }: { find: Find; isSelected?: 
   const s = getPriority(find);
   return (
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect}>
-      <div className="border-l-2 border-primary/40 pl-5 py-2">
+      <div className="border-l-2 border-primary/40 pl-5 py-2 mx-4 my-4">
         {find.excerpt && (
           <p className={cn("font-serif italic leading-relaxed text-foreground whitespace-pre-line", find.priority === 3 ? "text-2xl" : find.priority === 2 ? "text-xl" : "text-lg")}>
             {find.excerpt}
@@ -160,16 +161,18 @@ function MovieCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
 function BookCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
   const s = getPriority(find);
   return (
-    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="bg-amber-100/20 dark:bg-amber-500/[0.04] p-4">
-      <div className="flex items-center gap-2 text-muted-foreground mb-2">
-        <BookOpen className="h-3.5 w-3.5" />
-        <span className="text-xs uppercase tracking-wider">Book</span>
+    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="bg-amber-100/20 dark:bg-amber-500/[0.04]">
+      <div className="p-4">
+        <div className="flex items-center gap-2 text-muted-foreground mb-2">
+          <BookOpen className="h-3.5 w-3.5" />
+          <span className="text-xs uppercase tracking-wider">Book</span>
+        </div>
+        <h3 className={cn("font-semibold text-foreground", s.title)}>{find.title}</h3>
+        {find.author && (
+          <p className={cn("text-muted-foreground", s.body)}>by {find.author}</p>
+        )}
+        <p className={cn("mt-2 text-muted-foreground/80", s.body)}>{find.note}</p>
       </div>
-      <h3 className={cn("font-semibold text-foreground", s.title)}>{find.title}</h3>
-      {find.author && (
-        <p className={cn("text-muted-foreground", s.body)}>by {find.author}</p>
-      )}
-      <p className={cn("mt-2 text-muted-foreground/80", s.body)}>{find.note}</p>
     </CardWrapper>
   );
 }
@@ -245,7 +248,7 @@ function ArticleCard({ find, isSelected, onInspect }: { find: Find; isSelected?:
   const s = getPriority(find);
   const hasCover = find.coverVideoUrl || find.imageUrl;
   return (
-    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className={cn("overflow-hidden", !hasCover && "p-4")}>
+    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.coverVideoUrl && (
         <div className={cn("relative w-full overflow-hidden", find.priority === 3 ? "aspect-[3/4]" : "aspect-video")}>
           <iframe
@@ -267,7 +270,7 @@ function ArticleCard({ find, isSelected, onInspect }: { find: Find; isSelected?:
           />
         </div>
       )}
-      <div className={hasCover ? "p-4" : ""}>
+      <div className="p-4">
         <div className="flex items-center gap-2 text-muted-foreground mb-2">
           <FileText className="h-3.5 w-3.5" />
           <span className="text-xs uppercase tracking-wider">Article</span>
@@ -290,16 +293,18 @@ function ArticleCard({ find, isSelected, onInspect }: { find: Find; isSelected?:
 function MusicCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
   const s = getPriority(find);
   return (
-    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="bg-violet-100/20 dark:bg-violet-500/[0.04] p-4">
-      <div className="flex items-center gap-2 text-muted-foreground mb-2">
-        <Music className="h-3.5 w-3.5" />
-        <span className="text-xs uppercase tracking-wider">Music</span>
+    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="bg-violet-100/20 dark:bg-violet-500/[0.04]">
+      <div className="p-4">
+        <div className="flex items-center gap-2 text-muted-foreground mb-2">
+          <Music className="h-3.5 w-3.5" />
+          <span className="text-xs uppercase tracking-wider">Music</span>
+        </div>
+        <h3 className={cn("font-semibold text-foreground", s.title)}>{find.title}</h3>
+        {find.author && (
+          <p className={cn("text-muted-foreground", s.body)}>by {find.author}</p>
+        )}
+        <p className={cn("mt-2 text-muted-foreground/80", s.body)}>{find.note}</p>
       </div>
-      <h3 className={cn("font-semibold text-foreground", s.title)}>{find.title}</h3>
-      {find.author && (
-        <p className={cn("text-muted-foreground", s.body)}>by {find.author}</p>
-      )}
-      <p className={cn("mt-2 text-muted-foreground/80", s.body)}>{find.note}</p>
     </CardWrapper>
   );
 }
@@ -360,7 +365,7 @@ function PeopleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: 
   const s = getPriority(find);
   const hasCover = find.imageUrl;
   return (
-    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className={cn("overflow-hidden", !hasCover && "p-4")}>
+    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
         <div className={cn("relative w-full overflow-hidden", find.priority === 3 ? "aspect-[3/2]" : "aspect-video")}>
           <Image
@@ -378,7 +383,7 @@ function PeopleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: 
           <span className="text-xs uppercase tracking-wider">Person</span>
         </div>
         <h3 className={cn("font-semibold text-foreground", s.title)}>{find.title}</h3>
-        <p className={cn("mt-1 text-muted-foreground", s.body)}>{find.note}</p>
+        <p className={cn("mt-1 text-muted-foreground/80", s.body)}>{find.note}</p>
       </div>
     </CardWrapper>
   );
@@ -387,13 +392,15 @@ function PeopleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: 
 function OtherCard({ find, isSelected, onInspect }: { find: Find; isSelected?: boolean; onInspect?: () => void }) {
   const s = getPriority(find);
   return (
-    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="p-4">
-      <div className="flex items-center gap-2 text-muted-foreground mb-2">
-        <Sparkles className="h-3.5 w-3.5" />
-        <span className="text-xs uppercase tracking-wider">Find</span>
+    <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect}>
+      <div className="p-4">
+        <div className="flex items-center gap-2 text-muted-foreground mb-2">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span className="text-xs uppercase tracking-wider">Find</span>
+        </div>
+        <h3 className={cn("font-semibold text-foreground", s.title)}>{find.title}</h3>
+        <p className={cn("mt-2 text-muted-foreground/80", s.body)}>{find.note}</p>
       </div>
-      <h3 className={cn("font-semibold text-foreground", s.title)}>{find.title}</h3>
-      <p className={cn("mt-2 text-muted-foreground/80", s.body)}>{find.note}</p>
     </CardWrapper>
   );
 }
