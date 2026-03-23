@@ -37,7 +37,7 @@ export function Hero() {
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base text-center max-w-sm">
           Design Engineer.
           <br />
-          Currently at <a href="https://noon.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center align-baseline rounded-full border px-2 py-1 translate-y-[2px] bg-[#FEEE00] hover:bg-[#FEEE00]/80 transition-colors"><Image src="/noon-logo.svg" alt="noon" width={48} height={13} className="" /></a> — building at the intersection of design tools and code.
+          Currently at <a href="https://noon.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center align-baseline rounded-full border px-2 py-1 translate-y-[2px] bg-[#FEEE00] hover:bg-[#FEEE00]/80 transition-colors"><Image src="/noon-logo.svg" alt="noon" width={48} height={13} className="" /></a> building at the intersection of design tools and code.
         </p>
       </div>
       
