@@ -5,6 +5,7 @@ import { LyingCharacter } from "@/components/lying-character";
 export const metadata: Metadata = {
   title: "Projects",
   description: "Selected work by Khaled Ashraf.",
+  alternates: { canonical: "https://khaledashraf.me/projects" },
 };
 
 export default function ProjectsPage() {

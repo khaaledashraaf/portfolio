@@ -21,25 +21,34 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Khaled Ashraf",
+    default: "Khaled Ashraf — Design, Code, and Everything Between",
     template: "%s — Khaled Ashraf",
   },
   description:
     "Product Designer with a background in Computer Engineering. Building at the intersection of design tools and code.",
   openGraph: {
-    title: "Khaled Ashraf",
+    title: "Khaled Ashraf — Design, Code, and Everything Between",
     description:
       "Product Designer with a background in Computer Engineering. Building at the intersection of design tools and code.",
     url: "https://khaledashraf.me",
     siteName: "Khaled Ashraf",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "https://khaledashraf.me/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Khaled Ashraf",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Khaled Ashraf",
+    title: "Khaled Ashraf — Design, Code, and Everything Between",
     description:
       "Product Designer with a background in Computer Engineering. Building at the intersection of design tools and code.",
+    images: ["https://khaledashraf.me/og-image.jpg"],
   },
   robots: {
     index: true,

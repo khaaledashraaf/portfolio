@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 export const metadata: Metadata = {
   title: "Blog",
   description: "Thoughts on design, engineering, and the space in between.",
+  alternates: { canonical: "https://khaledashraf.me/blog" },
 };
 
 export default function BlogPage() {

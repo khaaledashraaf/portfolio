@@ -46,8 +46,26 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   if (!post) notFound();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    url: `https://khaledashraf.me/blog/${slug}`,
+    author: {
+      "@type": "Person",
+      name: "Khaled Ashraf",
+      url: "https://khaledashraf.me",
+    },
+  };
+
   return (
     <article className="py-16 sm:py-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mb-8 flex flex-col gap-2">
         <Link
           href="/blog"

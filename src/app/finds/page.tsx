@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Internet Finds",
   description:
     "A gallery of things I've found online that I think are worth sharing.",
+  alternates: { canonical: "https://khaledashraf.me/finds" },
 };
 
 export default function FindsPage() {

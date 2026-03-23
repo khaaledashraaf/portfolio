@@ -5,6 +5,7 @@ import { AboutContent } from "@/components/about-content";
 export const metadata: Metadata = {
   title: "About",
   description: "About Khaled Ashraf — Product Designer and Computer Engineer.",
+  alternates: { canonical: "https://khaledashraf.me/about" },
 };
 
 export default function AboutPage() {
