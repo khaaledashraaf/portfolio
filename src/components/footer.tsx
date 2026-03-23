@@ -20,7 +20,11 @@ export function Footer({ light = false, showAscii = true }: { light?: boolean; s
       <div className="relative z-10 py-8">
         <div className="mx-auto w-full max-w-4xl px-6">
           <div className={`flex flex-col items-center justify-between gap-4 text-sm sm:flex-row ${light ? "text-white/60" : "text-foreground/80"}`}>
-            <p className={light ? "text-white/80" : ""}>Khaled Ashraf</p>
+            <div className={`flex items-center gap-2 ${light ? "text-white/80" : ""}`}>
+              <span>© {new Date().getFullYear()} Khaled Ashraf</span>
+              <span className="text-white/40 dark:text-foreground/40">·</span>
+              <a href="/privacy" className={`transition-colors ${light ? "text-white/40 hover:text-white/60" : "text-foreground/40 hover:text-foreground/60"}`}>Privacy</a>
+            </div>
             <div className="flex gap-4">
               <a
                 href="https://github.com/khaaledashraaf"
