@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navbar";
 import { SiteChrome } from "@/components/site-chrome";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -68,6 +69,7 @@ export default function RootLayout({
         </ThemeProvider>
         <GoogleAnalytics gaId="G-LCV0P4FHDY" />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
