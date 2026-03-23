@@ -241,7 +241,7 @@ export function FindsGrid({ items, types }: FindsGridProps) {
       <FindCard
         find={findItem}
         isSelected={selectedFind?.id === findItem.id}
-        onInspect={findItem.featured ? (rect: DOMRect) => { setSelectedRect(rect); setSelectedFind(findItem); } : undefined}
+        onInspect={findItem.expandable ? (rect: DOMRect) => { setSelectedRect(rect); setSelectedFind(findItem); } : undefined}
       />
     );
   }

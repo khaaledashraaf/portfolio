@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 
 function useCardEffects(featured?: boolean) {
-  const ref = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ref = useRef<any>(null);
   const [hovering, setHovering] = useState(false);
 
   const handleMouseMove = useCallback(
@@ -113,9 +114,10 @@ interface CardWrapperProps {
 
 function CardWrapper({ find, className, children, isSelected, onInspect }: CardWrapperProps) {
   const p = find.priority ?? 1;
-  const isFeatured = find.featured && onInspect;
+  const isFeatured = !!find.featured;
+  const isExpandable = find.expandable && onInspect;
   const { ref, hovering, handleMouseMove, handleMouseEnter, handleMouseLeave } =
-    useCardEffects(!!isFeatured);
+    useCardEffects(isFeatured);
 
   const sharedClassName = cn(
     "group relative block break-inside-avoid",
@@ -138,34 +140,25 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
 
   if (isFeatured) {
     const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+    const canExpand = isExpandable && !isMobile;
 
-    if (isMobile) {
-      return (
-        <a
-          href={find.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={sharedClassName}
-        >
-          {find.sticker && <FeaturedSticker findId={find.id} stickerType={find.sticker} />}
-          <div className="relative overflow-hidden rounded-2xl">
-            {children}
-            {submittedByTag}
-          </div>
-        </a>
-      );
-    }
+    const handleClick = canExpand
+      ? (e: React.MouseEvent) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const adjusted = new DOMRect(rect.x, rect.y + 6, rect.width, rect.height);
+          onInspect!(adjusted);
+        }
+      : undefined;
+
+    const linkProps = !canExpand && find.sourceUrl
+      ? { href: find.sourceUrl, target: "_blank" as const, rel: "noopener noreferrer" }
+      : undefined;
+
+    const Outer = linkProps ? "a" : "div";
 
     return (
       <motion.div
-        onClick={(e) => {
-          if (onInspect) {
-            const rect = e.currentTarget.getBoundingClientRect();
-            // Compensate for the whileHover y offset — the card is lifted -6px when clicked
-            const adjusted = new DOMRect(rect.x, rect.y + 6, rect.width, rect.height);
-            onInspect(adjusted);
-          }
-        }}
+        onClick={handleClick}
         whileHover={{ y: -6 }}
         transition={{ type: "tween", duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
@@ -175,13 +168,14 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
         )}
         style={{ perspective: "800px" }}
       >
-        <div
+        <Outer
+          {...linkProps}
           ref={ref}
           onMouseMove={handleMouseMove}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           className={cn(
-            "relative rounded-2xl backdrop-blur-xl overflow-visible transition-transform duration-200 ease-out",
+            "relative block rounded-2xl backdrop-blur-xl overflow-visible transition-transform duration-200 ease-out",
             "bg-gradient-to-br from-white/60 via-white/40 to-white/20 dark:from-white/[0.08] dark:via-white/[0.04] dark:to-white/[0.01]",
             "shadow-[0_8px_32px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6),inset_0_-1px_0_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(255,255,255,0.02)]",
             "border border-white/40 dark:border-white/[0.08]",
@@ -200,7 +194,7 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
             {children}
             {submittedByTag}
           </div>
-        </div>
+        </Outer>
       </motion.div>
     );
   }
