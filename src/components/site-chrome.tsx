@@ -10,6 +10,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAbout = pathname === "/about";
   const isFinds = pathname.startsWith("/finds");
+  const isHome = pathname === "/";
   const showFooterExtras = !isAbout && !isFinds;
   const isProjects = pathname === "/projects";
 
@@ -34,7 +35,19 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             />
           </div>
         )}
-        <Footer light={isAbout} showAscii={showFooterExtras} />
+        {isHome && (
+          <div className="absolute bottom-0 left-0 right-0 z-0 pointer-events-none hidden md:block">
+            <Image
+              src="/ascii/footer.svg"
+              alt=""
+              width={1920}
+              height={400}
+              className="w-full h-auto opacity-80 dark:opacity-80 dark:invert"
+              priority={false}
+            />
+          </div>
+        )}
+        <Footer light={isAbout} />
       </div>
     </div>
   );
