@@ -12,6 +12,7 @@ export type FindType =
   | "other";
 
 export interface Find {
+  kind?: "find";
   id: string;
   title: string;
   type: FindType;
@@ -28,6 +29,19 @@ export interface Find {
   expandedNote?: string;
   submittedBy?: string;
 }
+
+export interface FindCollection {
+  kind: "collection";
+  id: string;
+  title: string;
+  note: string;
+  imageUrl?: string;
+  dateAdded: string;
+  priority?: 1 | 2 | 3;
+  items: Find[];
+}
+
+export type FindItem = Find | FindCollection;
 
 export const finds: Find[] = [
   {
@@ -128,5 +142,55 @@ export const finds: Find[] = [
     imageUrl: "https://m.media-amazon.com/images/M/MV5BMDAyY2FhYjctNDc5OS00MDNlLThiMGUtY2UxYWVkNGY2ZjljXkEyXkFqcGc@._V1_.jpg",
     dateAdded: "2026-03-22",
     priority: 1,
+  },
+];
+
+export const collections: FindCollection[] = [
+  {
+    kind: "collection",
+    id: "collection-gary-hustwit",
+    title: "Gary Hustwit",
+    note: "Four design documentaries — from typography to industrial design to urban planning.",
+    dateAdded: "2026-03-23",
+    priority: 2,
+    imageUrl: "https://www.idsa.org/wp-content/uploads/2023/01/GaryHustwit-Headshot-POST.jpg",
+    items: [
+      {
+        id: "gh-helvetica",
+        title: "Helvetica",
+        type: "movie",
+        note: "A documentary about typography, graphic design, and global visual culture. It explores the proliferation of one typeface as part of a larger conversation about the way type affects our lives.",
+        sourceUrl: "https://www.imdb.com/title/tt0847817/",
+        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7rCyagaHz8qyKOgOR20X6ijqcIJUtRiddVD-mb-8I4IwQ-kTyLfoSvjea7fr88Q2blk2-gg&s=10",
+        dateAdded: "2026-03-23",
+      },
+      {
+        id: "gh-objectified",
+        title: "Objectified",
+        type: "movie",
+        note: "A look at the creativity behind everything from toothbrushes to tech gadgets. Features Dieter Rams, Jony Ive, and the designers who shape the objects we use every day.",
+        sourceUrl: "https://www.imdb.com/title/tt1241325/",
+        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8_LjPFDABch-2yn6NP2H2xAqYN8VXWpSKaJUtYc3ylFmkuRICAju2g8RoShqKEB67o9LE2w&s=10",
+        dateAdded: "2026-03-23",
+      },
+      {
+        id: "gh-urbanized",
+        title: "Urbanized",
+        type: "movie",
+        note: "The design of cities and the forces that shape them. From the High Line in New York to the favelas of São Paulo.",
+        sourceUrl: "https://www.imdb.com/title/tt1701976/",
+        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO1bg_Z8aXyOWxFwD4WIK_GTSqpjRWh_QDGBQ5j7OSfh4zxqhhyTbCIgPyNasgOaV5ADfgIA&s=10",
+        dateAdded: "2026-03-23",
+      },
+      {
+        id: "gh-rams",
+        title: "Rams",
+        type: "movie",
+        note: "A portrait of Dieter Rams, the legendary designer behind Braun and a huge influence on Apple. Less but better.",
+        sourceUrl: "https://www.imdb.com/title/tt8091002/",
+        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6-b_MMCh1R8JpAzWAvDXXqImSy3whMAopXRUJZQROOxMgPRiMx-RJw_btXYRfidMlymdxoQ&s=10",
+        dateAdded: "2026-03-23",
+      },
+    ],
   },
 ];

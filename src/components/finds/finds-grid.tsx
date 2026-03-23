@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Find, FindType } from "@/content/finds";
+import type { Find, FindType, FindItem } from "@/content/finds";
 import { FindCard } from "./find-card";
+import { CollectionCard } from "./collection-card";
 import { FindDetailOverlay } from "./find-detail";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -20,6 +21,7 @@ import {
   Wrench,
   PenLine,
   User,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -66,8 +68,12 @@ const typeIcons: Record<FindType, React.FC<{ className?: string }>> = {
   other: Sparkles,
 };
 
+function isCollection(item: FindItem): item is FindItem & { kind: "collection" } {
+  return item.kind === "collection";
+}
+
 interface FindsGridProps {
-  finds: Find[];
+  items: FindItem[];
   types: FindType[];
 }
 
@@ -104,10 +110,63 @@ function FindListItem({ find }: { find: Find }) {
   );
 }
 
-export function FindsGrid({ finds, types }: FindsGridProps) {
+function CollectionListItem({
+  collection,
+  isExpanded,
+  onToggle,
+}: {
+  collection: FindItem & { kind: "collection" };
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        className="group flex items-start gap-4 py-3 border-b border-border/40 transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg w-full text-left"
+      >
+        <Layers className="h-4 w-4 mt-1 shrink-0 text-muted-foreground" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2">
+            <h3 className="font-semibold text-foreground group-hover:underline truncate">
+              {collection.title}
+            </h3>
+            <span className="text-sm text-muted-foreground shrink-0">
+              {collection.items.length} items
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">{collection.note}</p>
+        </div>
+        <span className="text-xs text-muted-foreground/60 shrink-0 mt-1">
+          Collection
+        </span>
+      </button>
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="pl-8">
+              {collection.items.map((find) => (
+                <FindListItem key={find.id} find={find} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export function FindsGrid({ items, types }: FindsGridProps) {
   const [activeType, setActiveType] = useState<FindType | null>(null);
   const [view, setView] = useState<ViewMode>("grid");
   const [selectedFind, setSelectedFind] = useState<Find | null>(null);
+  const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set());
 
   const [colCount, setColCount] = useState(3);
 
@@ -122,19 +181,31 @@ export function FindsGrid({ finds, types }: FindsGridProps) {
     return () => window.removeEventListener("resize", updateCols);
   }, []);
 
-  const filtered = useMemo(
-    () => activeType ? finds.filter((f) => f.type === activeType) : finds,
-    [finds, activeType]
-  );
+  const toggleCollection = useCallback((id: string) => {
+    setExpandedCollections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!activeType) return items;
+    return items.filter((f) => {
+      if (isCollection(f)) return f.items.some((child) => child.type === activeType);
+      return f.type === activeType;
+    });
+  }, [items, activeType]);
 
   const effectiveCols = useMemo(() => {
     return Math.min(colCount, filtered.length);
   }, [colCount, filtered.length]);
 
   const columns = useMemo(() => {
-    const cols: Find[][] = Array.from({ length: effectiveCols }, () => []);
-    filtered.forEach((find, i) => {
-      cols[i % effectiveCols].push(find);
+    const cols: FindItem[][] = Array.from({ length: effectiveCols }, () => []);
+    filtered.forEach((findItem, i) => {
+      cols[i % effectiveCols].push(findItem);
     });
     return cols;
   }, [filtered, effectiveCols]);
@@ -143,6 +214,35 @@ export function FindsGrid({ finds, types }: FindsGridProps) {
     if (colCount <= 1) return 0;
     return colCount - effectiveCols;
   }, [colCount, effectiveCols]);
+
+  // Collect all plain finds for the detail overlay's "related" section
+  const allFinds = useMemo(() => {
+    const result: Find[] = [];
+    items.forEach((f) => {
+      if (isCollection(f)) result.push(...f.items);
+      else result.push(f);
+    });
+    return result;
+  }, [items]);
+
+  function renderGridItem(findItem: FindItem) {
+    if (isCollection(findItem)) {
+      return (
+        <CollectionCard
+          collection={findItem}
+          isExpanded={expandedCollections.has(findItem.id)}
+          onToggle={() => toggleCollection(findItem.id)}
+        />
+      );
+    }
+    return (
+      <FindCard
+        find={findItem}
+        isSelected={selectedFind?.id === findItem.id}
+        onInspect={findItem.featured ? () => setSelectedFind(findItem) : undefined}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -201,13 +301,9 @@ export function FindsGrid({ finds, types }: FindsGridProps) {
             initial="hidden"
             animate="show"
           >
-            {filtered.map((find) => (
-              <motion.div key={find.id} variants={item}>
-                <FindCard
-                  find={find}
-                  isSelected={selectedFind?.id === find.id}
-                  onInspect={find.featured ? () => setSelectedFind(find) : undefined}
-                />
+            {filtered.map((findItem) => (
+              <motion.div key={findItem.id} variants={item}>
+                {renderGridItem(findItem)}
               </motion.div>
             ))}
           </motion.div>
@@ -221,16 +317,9 @@ export function FindsGrid({ finds, types }: FindsGridProps) {
           >
             {columns.map((col, colIndex) => (
               <div key={colIndex} className="flex-1 min-w-0 flex flex-col gap-4">
-                {col.map((find) => (
-                  <motion.div
-                    key={find.id}
-                    variants={item}
-                  >
-                    <FindCard
-                      find={find}
-                      isSelected={selectedFind?.id === find.id}
-                      onInspect={find.featured ? () => setSelectedFind(find) : undefined}
-                    />
+                {col.map((findItem) => (
+                  <motion.div key={findItem.id} variants={item}>
+                    {renderGridItem(findItem)}
                   </motion.div>
                 ))}
               </div>
@@ -252,9 +341,17 @@ export function FindsGrid({ finds, types }: FindsGridProps) {
           initial="hidden"
           animate="show"
         >
-          {filtered.map((find) => (
-            <motion.div key={find.id} variants={item}>
-              <FindListItem find={find} />
+          {filtered.map((findItem) => (
+            <motion.div key={findItem.id} variants={item}>
+              {isCollection(findItem) ? (
+                <CollectionListItem
+                  collection={findItem}
+                  isExpanded={expandedCollections.has(findItem.id)}
+                  onToggle={() => toggleCollection(findItem.id)}
+                />
+              ) : (
+                <FindListItem find={findItem} />
+              )}
             </motion.div>
           ))}
         </motion.div>
@@ -268,7 +365,7 @@ export function FindsGrid({ finds, types }: FindsGridProps) {
         {selectedFind && (
           <FindDetailOverlay
             find={selectedFind}
-            allFinds={finds}
+            allFinds={allFinds}
             onClose={() => setSelectedFind(null)}
           />
         )}

@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
       { hostname: "i.pinimg.com" },
       { hostname: "pbs.twimg.com" },
       { hostname: "cdn.sanity.io" },
+      { hostname: "www.idsa.org" },
+      { hostname: "encrypted-tbn0.gstatic.com" },
     ],
   },
 };
