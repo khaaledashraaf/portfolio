@@ -140,7 +140,26 @@ function CardWrapper({ find, className, children, isSelected, onInspect }: CardW
 
   if (isFeatured) {
     const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
-    const canExpand = isExpandable && !isMobile;
+
+    // Mobile: plain link, no hover effects
+    if (isMobile) {
+      return (
+        <a
+          href={find.sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={sharedClassName}
+        >
+          {find.sticker && <FeaturedSticker findId={find.id} stickerType={find.sticker} />}
+          <div className="relative overflow-hidden rounded-2xl">
+            {children}
+            {submittedByTag}
+          </div>
+        </a>
+      );
+    }
+
+    const canExpand = !!isExpandable;
 
     const handleClick = canExpand
       ? (e: React.MouseEvent) => {
