@@ -7,7 +7,7 @@ export function LyingCharacter({ className = "" }: { className?: string }) {
         loop
         muted
         playsInline
-        className="w-64 md:w-80 dark:invert opacity-80"
+        className="w-64 md:w-70 dark:invert opacity-80"
       />
     </div>
   );

@@ -10,7 +10,7 @@ export function Footer({ light = false, showAscii = true }: { light?: boolean; s
             alt=""
             width={1920}
             height={400}
-            className="w-full h-auto opacity-60 dark:opacity-60 dark:invert"
+            className="w-full h-auto opacity-80 dark:opacity-80 dark:invert"
             priority={false}
           />
         </div>
