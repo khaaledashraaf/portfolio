@@ -102,7 +102,7 @@ export function FindDetailOverlay({
         }}
         onAnimationComplete={() => setLanded(true)}
       >
-        <FindCard find={find} />
+        <FindCard find={find} onInspect={() => {}} />
       </motion.div>
     </div>
   );
