@@ -31,7 +31,7 @@ export function FindsHeader() {
       </motion.h1>
       <motion.div variants={item} className="flex items-center justify-between gap-4">
         <p className="text-muted-foreground">
-          A gallery of things I&apos;ve found online that I think are worth sharing.
+          A gallery of things found online that I think are worth sharing.
         </p>
         <SubmitFindButton />
       </motion.div>

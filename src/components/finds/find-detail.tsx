@@ -27,7 +27,7 @@ function MiniCard({ card }: { card: ExpandedCard }) {
   if (card.type === "image") {
     return (
       <div className="flex flex-col gap-1.5">
-        <div className="rounded-lg overflow-hidden border border-white/10">
+        <div className="rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 dark:backdrop-blur-sm shadow-lg">
           <Image
             src={card.src}
             alt={card.caption}
@@ -36,7 +36,7 @@ function MiniCard({ card }: { card: ExpandedCard }) {
             className="w-full h-auto"
           />
         </div>
-        <span className="font-mono text-[10px] text-white/60 px-0.5 truncate">
+        <span className="font-mono text-[10px] text-white px-0.5 truncate drop-shadow-md">
           {card.caption}
         </span>
       </div>
@@ -51,13 +51,13 @@ function MiniCard({ card }: { card: ExpandedCard }) {
         rel="noopener noreferrer"
         className="flex flex-col gap-1.5 group"
       >
-        <div className="rounded-lg overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm p-4 flex flex-col gap-2 group-hover:bg-white/10 transition-colors">
-          <ExternalLink className="h-4 w-4 text-white/40" />
-          <span className="font-mono text-xs text-white/80 font-medium">
+        <div className="rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 dark:backdrop-blur-sm shadow-lg p-4 flex flex-col gap-2 group-hover:bg-neutral-50 dark:group-hover:bg-neutral-800 transition-colors">
+          <ExternalLink className="h-4 w-4 text-neutral-400 dark:text-white/40" />
+          <span className="font-mono text-xs text-neutral-700 dark:text-white/80 font-medium">
             {card.title}
           </span>
         </div>
-        <span className="font-mono text-[10px] text-white/60 px-0.5 truncate">
+        <span className="font-mono text-[10px] text-white px-0.5 truncate drop-shadow-md">
           {card.caption}
         </span>
       </a>
@@ -67,13 +67,13 @@ function MiniCard({ card }: { card: ExpandedCard }) {
   // snippet
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="rounded-lg overflow-hidden border border-white/10 bg-white/5 backdrop-blur-sm p-4 flex flex-col gap-2">
-        <FileText className="h-4 w-4 text-white/40" />
-        <p className="font-mono text-[11px] text-white/70 leading-relaxed line-clamp-4">
+      <div className="rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 dark:backdrop-blur-sm shadow-lg p-4 flex flex-col gap-2">
+        <FileText className="h-4 w-4 text-neutral-400 dark:text-white/40" />
+        <p className="font-mono text-[11px] text-neutral-600 dark:text-white/70 leading-relaxed line-clamp-4">
           {card.text}
         </p>
       </div>
-      <span className="font-mono text-[10px] text-white/60 px-0.5 truncate">
+      <span className="font-mono text-[10px] text-white px-0.5 truncate drop-shadow-md">
         {card.caption}
       </span>
     </div>
@@ -232,7 +232,7 @@ export function FindDetailOverlay({
 
       {/* The card — same FindCard, just animated from origin to center */}
       <motion.div
-        className="fixed z-[55] pointer-events-none"
+        className="fixed z-[55] pointer-events-none rounded-2xl bg-background"
         style={{ width: ow }}
         initial={{
           left: ox,
