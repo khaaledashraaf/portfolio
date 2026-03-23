@@ -11,6 +11,11 @@ export type FindType =
   | "people"
   | "other";
 
+export type ExpandedCard =
+  | { type: "image"; src: string; caption: string; rotate?: number }
+  | { type: "link"; url: string; title: string; caption: string; rotate?: number }
+  | { type: "snippet"; text: string; caption: string; rotate?: number };
+
 export interface Find {
   kind?: "find";
   id: string;
@@ -27,6 +32,7 @@ export interface Find {
   featured?: boolean;
   sticker?: "star" | "heart" | "thumbs-up";
   expandedNote?: string;
+  expandedCards?: ExpandedCard[];
   submittedBy?: string;
 }
 
@@ -100,6 +106,40 @@ export const finds: Find[] = [
     featured: true,
     sticker: "heart",
     expandedNote: "Susan Kare is the iconographer who designed the first icons for Apple's Mac — making computers feel friendly and human. Working with Steve Jobs in the early 1980s, she created pixel-perfect icons on a 32×32 grid that became the visual language of personal computing: the Happy Mac, the paintbrush, the trash can, the command key symbol (⌘). Her presentation is a joy to watch — she walks through her process with warmth and humor. She even mentioned a book called \"Understanding Comics: The Invisible Art\" by Scott McCloud, which went straight to my read list. What strikes me most is how she proved that constraints (tiny grids, limited pixels) don't limit creativity — they focus it.",
+    expandedCards: [
+      {
+        type: "image",
+        src: "https://www.cnet.com/a/img/resize/ce8361ffff6ab6e6301e3f82454695589998c025/hub/2011/12/01/e8149075-f0ef-11e2-8c7c-d4ae52e62bcc/Smiling_computer_5x5.jpg?auto=webp&width=1200",
+        caption: "Happy Mac",
+        rotate: -6,
+      },
+      {
+        type: "image",
+        src: "https://i.pinimg.com/736x/46/69/d6/4669d6c2625202d4fde18a6277bf98c6.jpg",
+        caption: "Original Macintosh icons",
+        rotate: 4,
+      },
+      {
+        type: "image",
+        src: "https://pbs.twimg.com/media/DvrzYndXcAAgmnA.jpg",
+        caption: "Kare's pixel art portraits",
+        rotate: -3,
+      },
+      {
+        type: "link",
+        url: "https://en.wikipedia.org/wiki/Susan_Kare",
+        title: "Wikipedia",
+        caption: "Susan Kare on Wikipedia",
+        rotate: 2,
+      },
+      {
+        type: "link",
+        url: "https://vimeo.com/97583369",
+        title: "Vimeo Talk",
+        caption: "Her EG8 presentation",
+        rotate: -4,
+      },
+    ],
   },
   {
     id: "6",
