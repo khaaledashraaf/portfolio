@@ -46,6 +46,17 @@ export type FindItem = Find | FindCollection;
 
 export const finds: Find[] = [
   {
+    id: "10",
+    title: "DONKS",
+    type: "video",
+    note: "A really fun musical animation by FelixColgrave about consumerism and greed.",
+    sourceUrl: "https://youtu.be/4gvSYEqOMn8?si=zD8MH6p0Ik4K5g0m",
+    imageUrl: "https://img.youtube.com/vi/4gvSYEqOMn8/mqdefault.jpg",
+    dateAdded: "2026-03-24",
+    author: "FelixColgrave",
+    priority: 1,
+  },
+  {
     id: "1",
     title: "The Green Mile",
     type: "movie",
