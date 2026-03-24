@@ -312,20 +312,8 @@ function AdminFindsInner() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [committing, setCommitting] = useState(false);
-  const [find, setFind] = useState<Find | null>({
-    id: "find-test",
-    title: "Interstellar",
-    type: "movie",
-    note: "The docking scene still gives me chills. A film about love disguised as sci-fi.",
-    sourceUrl: "https://www.imdb.com/titl2/tt0812692/",
-    imageUrl: "https://m.media-amazon.com/images/M/MV5BYzdjMDAxZGItMjI2My00ODA1LTlkNzItOWFjMDU5ZDJlYWY3XkEyXkFqcGc@._V1_.jpg",
-    author: "",
-    priority: 2,
-    dateAdded: "2026-03-24",
-    featured: false,
-    sticker: undefined,
-  });
-  const [step, setStep] = useState<"url" | "edit" | "preview">("edit");
+  const [find, setFind] = useState<Find | null>(null);
+  const [step, setStep] = useState<"url" | "edit" | "preview">("url");
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   useEffect(() => {
