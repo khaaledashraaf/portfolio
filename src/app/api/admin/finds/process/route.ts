@@ -91,8 +91,9 @@ Return ONLY valid JSON, no markdown wrapping, no explanation.`,
       ],
     });
 
-    const text =
+    const raw =
       message.content[0].type === "text" ? message.content[0].text : "";
+    const text = raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
     const find = JSON.parse(text);
 
     find.sourceUrl = url;
@@ -102,7 +103,7 @@ Return ONLY valid JSON, no markdown wrapping, no explanation.`,
   } catch (error) {
     console.error("Process error:", error);
     return NextResponse.json(
-      { error: "Failed to process URL" },
+      { error: error instanceof Error ? error.message : "Failed to process URL" },
       { status: 500 }
     );
   }
