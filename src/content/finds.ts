@@ -1,15 +1,9 @@
-export type FindType =
-  | "movie"
-  | "book"
-  | "reel"
-  | "video"
-  | "poetry"
-  | "article"
-  | "music"
-  | "image"
-  | "tool"
-  | "people"
-  | "other";
+export const FIND_TYPES = [
+  "movie", "book", "reel", "video", "poetry",
+  "article", "music", "image", "tool", "people", "other",
+] as const;
+
+export type FindType = (typeof FIND_TYPES)[number];
 
 export type ExpandedCard =
   | { type: "image"; src: string; caption: string; rotate?: number }

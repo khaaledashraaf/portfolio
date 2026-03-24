@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["sarkless-margarette-postmeningeal.ngrok-free.dev"],
   images: {
     remotePatterns: [
       { hostname: "m.media-amazon.com" },

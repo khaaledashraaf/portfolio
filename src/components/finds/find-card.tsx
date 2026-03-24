@@ -19,7 +19,7 @@ import {
   User,
 } from "lucide-react";
 
-function useCardEffects(featured?: boolean) {
+export function useCardEffects(featured?: boolean) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ref = useRef<any>(null);
   const [hovering, setHovering] = useState(false);
@@ -59,7 +59,7 @@ function useCardEffects(featured?: boolean) {
   return { ref, hovering, handleMouseMove, handleMouseEnter, handleMouseLeave };
 }
 
-function SpotlightOverlay({ hovering }: { hovering: boolean }) {
+export function SpotlightOverlay({ hovering }: { hovering: boolean }) {
   return (
     <div
       className="pointer-events-none absolute inset-0 z-10 rounded-2xl transition-opacity duration-500"
@@ -72,7 +72,7 @@ function SpotlightOverlay({ hovering }: { hovering: boolean }) {
   );
 }
 
-function GlareOverlay({ hovering }: { hovering: boolean }) {
+export function GlareOverlay({ hovering }: { hovering: boolean }) {
   return (
     <div
       className="pointer-events-none absolute inset-0 z-10 rounded-2xl transition-opacity duration-500"
@@ -527,7 +527,7 @@ function OtherCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
       <div className="p-4">
         <div className="flex items-center gap-2 text-muted-foreground mb-2">
           <Sparkles className="h-3.5 w-3.5" />
-          <span className="text-xs uppercase tracking-wider">Find</span>
+          <span className="text-xs uppercase tracking-wider">Other</span>
         </div>
         <h3 className={cn("font-semibold text-foreground", s.title)}>{find.title}</h3>
         <p className={cn("mt-2 text-muted-foreground/80", s.body)}>{find.note}</p>

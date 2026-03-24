@@ -11,7 +11,7 @@ export default function AdminFindsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex flex-1 flex-col">
       {children}
     </div>
   );
