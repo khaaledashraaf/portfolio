@@ -21,6 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  manifest: "/manifest.json",
   title: {
     default: "Khaled Ashraf — Design, Code, and Everything Between",
     template: "%s — Khaled Ashraf",
