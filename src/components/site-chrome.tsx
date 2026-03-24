@@ -31,7 +31,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               alt=""
               width={220}
               height={220}
-              className="opacity-80 dark:invert"
+              className="w-auto h-auto opacity-80 dark:invert"
             />
           </div>
         )}

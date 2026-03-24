@@ -31,7 +31,7 @@ export function FeaturedSticker({ findId, stickerType }: { findId: string; stick
         alt={sticker.alt}
         width={28}
         height={28}
-        className="pointer-events-none [filter:drop-shadow(1.25px_0_0_white)_drop-shadow(-1.25px_0_0_white)_drop-shadow(0_1.25px_0_white)_drop-shadow(0_-1.25px_0_white)_drop-shadow(1.25px_1.25px_0_white)_drop-shadow(-1.25px_1.25px_0_white)_drop-shadow(1.25px_-1.25px_0_white)_drop-shadow(-1.25px_-1.25px_0_white)_drop-shadow(0_1px_2px_rgba(0,0,0,0.15))]"
+        className="w-auto h-auto pointer-events-none [filter:drop-shadow(1.25px_0_0_white)_drop-shadow(-1.25px_0_0_white)_drop-shadow(0_1.25px_0_white)_drop-shadow(0_-1.25px_0_white)_drop-shadow(1.25px_1.25px_0_white)_drop-shadow(-1.25px_1.25px_0_white)_drop-shadow(1.25px_-1.25px_0_white)_drop-shadow(-1.25px_-1.25px_0_white)_drop-shadow(0_1px_2px_rgba(0,0,0,0.15))]"
       />
     </div>
   );
