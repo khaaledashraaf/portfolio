@@ -11,37 +11,11 @@ import {
   Music, ImageIcon, Sparkles, Wrench, User, SquarePen, Trash2,
 } from "lucide-react";
 
-const DRAFTS_KEY = "finds-drafts";
-
 type DraftEntry = {
   draftId: string;
   draftSavedAt: string;
   find: Find;
 };
-
-function getDrafts(): DraftEntry[] {
-  try {
-    return JSON.parse(localStorage.getItem(DRAFTS_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveDraftToStorage(find: Find, existingDraftId?: string): string {
-  const drafts = getDrafts();
-  const draftId = existingDraftId || `draft-${Date.now()}`;
-  const entry: DraftEntry = { draftId, draftSavedAt: new Date().toISOString(), find };
-  const idx = drafts.findIndex((d) => d.draftId === draftId);
-  if (idx >= 0) drafts[idx] = entry;
-  else drafts.unshift(entry);
-  localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
-  return draftId;
-}
-
-function deleteDraftFromStorage(draftId: string) {
-  const drafts = getDrafts().filter((d) => d.draftId !== draftId);
-  localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
-}
 
 // Full drop-shadow matching FeaturedSticker in pixel-stickers.tsx
 const STICKER_FILTER = [
@@ -364,8 +338,14 @@ function AdminFindsInner() {
   }, []);
 
   useEffect(() => {
-    setDrafts(getDrafts());
-  }, []);
+    if (!token) return;
+    fetch("/api/admin/finds/drafts", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => r.json())
+      .then((data) => { if (data.drafts) setDrafts(data.drafts); })
+      .catch(() => {});
+  }, [token]);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -438,8 +418,12 @@ function AdminFindsInner() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to commit");
       if (currentDraftId) {
-        deleteDraftFromStorage(currentDraftId);
-        setDrafts(getDrafts());
+        await fetch("/api/admin/finds/drafts", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ draftId: currentDraftId }),
+        });
+        setDrafts((prev) => prev.filter((d) => d.draftId !== currentDraftId));
         setCurrentDraftId(null);
       }
       setStatus({ type: "success", message: `Saved! (ID: ${data.id}) Site will rebuild shortly.` });
@@ -458,12 +442,25 @@ function AdminFindsInner() {
     setFind({ ...find, [field]: value });
   }
 
-  function saveDraft() {
+  async function saveDraft() {
     if (!find) return;
-    const draftId = saveDraftToStorage(find, currentDraftId ?? undefined);
-    setCurrentDraftId(draftId);
-    setDrafts(getDrafts());
-    setStatus({ type: "success", message: "Saved to drafts." });
+    setStatus(null);
+    try {
+      const res = await fetch("/api/admin/finds/drafts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ find, draftId: currentDraftId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save draft");
+      setCurrentDraftId(data.draftId);
+      const updated = await fetch("/api/admin/finds/drafts", { headers: { Authorization: `Bearer ${token}` } });
+      const updatedData = await updated.json();
+      if (updatedData.drafts) setDrafts(updatedData.drafts);
+      setStatus({ type: "success", message: "Saved to drafts." });
+    } catch (err) {
+      setStatus({ type: "error", message: err instanceof Error ? err.message : "Failed to save draft" });
+    }
   }
 
   function loadDraft(entry: DraftEntry) {
@@ -473,10 +470,18 @@ function AdminFindsInner() {
     setStep("edit");
   }
 
-  function deleteDraft(draftId: string) {
-    deleteDraftFromStorage(draftId);
-    setDrafts(getDrafts());
-    if (currentDraftId === draftId) setCurrentDraftId(null);
+  async function deleteDraft(draftId: string) {
+    try {
+      await fetch("/api/admin/finds/drafts", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ draftId }),
+      });
+      setDrafts((prev) => prev.filter((d) => d.draftId !== draftId));
+      if (currentDraftId === draftId) setCurrentDraftId(null);
+    } catch {
+      // silently fail
+    }
   }
 
   // Auth gate
