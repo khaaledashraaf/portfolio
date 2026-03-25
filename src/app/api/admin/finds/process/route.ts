@@ -2,7 +2,28 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { validateAuth, unauthorized } from "../helpers";
 
+function isYouTubeUrl(url: string) {
+  return /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(url);
+}
+
+async function fetchYouTubeMetadata(url: string) {
+  const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+  const res = await fetch(oembedUrl, { signal: AbortSignal.timeout(10000) });
+  if (!res.ok) throw new Error("YouTube oEmbed failed");
+  const data = await res.json();
+  return {
+    title: data.title || "",
+    description: "",
+    image: data.thumbnail_url || "",
+    siteName: "YouTube",
+    type: "video",
+    author: data.author_name || "",
+  };
+}
+
 async function fetchPageMetadata(url: string) {
+  if (isYouTubeUrl(url)) return fetchYouTubeMetadata(url);
+
   try {
     const res = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; FindsBot/1.0)" },
