@@ -8,8 +8,40 @@ import { cn } from "@/lib/utils";
 import { FindCard } from "@/components/finds/find-card";
 import {
   Film, BookOpen, Play, MonitorPlay, FileText,
-  Music, ImageIcon, Sparkles, Wrench, User, SquarePen,
+  Music, ImageIcon, Sparkles, Wrench, User, SquarePen, Trash2,
 } from "lucide-react";
+
+const DRAFTS_KEY = "finds-drafts";
+
+type DraftEntry = {
+  draftId: string;
+  draftSavedAt: string;
+  find: Find;
+};
+
+function getDrafts(): DraftEntry[] {
+  try {
+    return JSON.parse(localStorage.getItem(DRAFTS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveDraftToStorage(find: Find, existingDraftId?: string): string {
+  const drafts = getDrafts();
+  const draftId = existingDraftId || `draft-${Date.now()}`;
+  const entry: DraftEntry = { draftId, draftSavedAt: new Date().toISOString(), find };
+  const idx = drafts.findIndex((d) => d.draftId === draftId);
+  if (idx >= 0) drafts[idx] = entry;
+  else drafts.unshift(entry);
+  localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+  return draftId;
+}
+
+function deleteDraftFromStorage(draftId: string) {
+  const drafts = getDrafts().filter((d) => d.draftId !== draftId);
+  localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+}
 
 // Full drop-shadow matching FeaturedSticker in pixel-stickers.tsx
 const STICKER_FILTER = [
@@ -315,6 +347,8 @@ function AdminFindsInner() {
   const [find, setFind] = useState<Find | null>(null);
   const [step, setStep] = useState<"url" | "edit" | "preview">("url");
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [drafts, setDrafts] = useState<DraftEntry[]>([]);
+  const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
 
   useEffect(() => {
     const shared = searchParams.get("url") || searchParams.get("text") || "";
@@ -327,6 +361,10 @@ function AdminFindsInner() {
   useEffect(() => {
     const saved = sessionStorage.getItem("finds-token");
     if (saved) setToken(saved);
+  }, []);
+
+  useEffect(() => {
+    setDrafts(getDrafts());
   }, []);
 
   useEffect(() => {
@@ -399,6 +437,11 @@ function AdminFindsInner() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to commit");
+      if (currentDraftId) {
+        deleteDraftFromStorage(currentDraftId);
+        setDrafts(getDrafts());
+        setCurrentDraftId(null);
+      }
       setStatus({ type: "success", message: `Saved! (ID: ${data.id}) Site will rebuild shortly.` });
       setFind(null);
       setUrl("");
@@ -413,6 +456,27 @@ function AdminFindsInner() {
   function updateFind(field: keyof Find, value: unknown) {
     if (!find) return;
     setFind({ ...find, [field]: value });
+  }
+
+  function saveDraft() {
+    if (!find) return;
+    const draftId = saveDraftToStorage(find, currentDraftId ?? undefined);
+    setCurrentDraftId(draftId);
+    setDrafts(getDrafts());
+    setStatus({ type: "success", message: "Saved to drafts." });
+  }
+
+  function loadDraft(entry: DraftEntry) {
+    setFind(entry.find);
+    setCurrentDraftId(entry.draftId);
+    setStatus(null);
+    setStep("edit");
+  }
+
+  function deleteDraft(draftId: string) {
+    deleteDraftFromStorage(draftId);
+    setDrafts(getDrafts());
+    if (currentDraftId === draftId) setCurrentDraftId(null);
   }
 
   // Auth gate
@@ -496,6 +560,32 @@ function AdminFindsInner() {
               {status.message}
             </div>
           )}
+
+          {drafts.length > 0 && (
+            <div className="flex flex-col gap-2 pt-2">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">Drafts</span>
+              {drafts.map((entry) => (
+                <div
+                  key={entry.draftId}
+                  className="flex items-center gap-3 rounded-lg border border-border bg-background px-3 py-2.5"
+                >
+                  <button
+                    onClick={() => loadDraft(entry)}
+                    className="flex-1 text-left min-w-0"
+                  >
+                    <p className="text-sm font-medium truncate">{entry.find.title || "Untitled"}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{entry.find.type} · {new Date(entry.draftSavedAt).toLocaleDateString()}</p>
+                  </button>
+                  <button
+                    onClick={() => deleteDraft(entry.draftId)}
+                    className="shrink-0 text-muted-foreground/40 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -555,17 +645,29 @@ function AdminFindsInner() {
             </label>
           </div>
 
+          {status && (
+            <div className={cn("rounded-lg px-4 py-3 text-sm", status.type === "success" ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500")}>
+              {status.message}
+            </div>
+          )}
+
           {/* Navigation */}
           <div className="flex gap-3 mt-3">
             <button
               onClick={() => setStep("url")}
-              className="flex-1 rounded-lg border border-border px-3 py-2 text-base font-medium text-foreground"
+              className="rounded-lg border border-border px-3 py-2 text-base font-medium text-foreground"
             >
               Back
             </button>
             <button
+              onClick={saveDraft}
+              className="flex-1 rounded-lg border border-border px-3 py-2 text-base font-medium text-foreground"
+            >
+              Save Draft
+            </button>
+            <button
               onClick={() => setStep("preview")}
-              className="flex-1 rounded-lg bg-foreground px-3 py-2 text-base font-medium text-background"
+              className="rounded-lg bg-foreground px-3 py-2 text-base font-medium text-background"
             >
               Preview
             </button>
