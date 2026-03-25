@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/apps/saveplus/:path*",
-      "destination": "https://saveplus.vercel.app/apps/saveplus/:path*"
-    }
-  ]
-}
