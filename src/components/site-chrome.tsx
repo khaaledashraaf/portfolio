@@ -14,6 +14,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const isHome = pathname === "/";
   const showFooterExtras = !isAbout && !isFinds;
   const isProjects = pathname === "/projects";
+  const isBlog = pathname.startsWith("/blog");
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
@@ -24,7 +25,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <div className={`relative ${isAdmin ? "hidden" : ""}`}>
-        {showFooterExtras && <LyingCharacter className={isProjects ? "hidden sm:flex" : ""} />}
+        {showFooterExtras && <LyingCharacter className={isProjects || isBlog ? "hidden sm:flex" : ""} />}
         {isFinds && (
           <div className="flex justify-center sm:absolute sm:bottom-0 sm:left-1/2 sm:-translate-x-1/2">
             <Image
