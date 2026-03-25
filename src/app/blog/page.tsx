@@ -36,7 +36,7 @@ export default function BlogPage() {
     // </div>
     <div className="flex min-h-[calc(100vh-15rem)] flex-col items-center justify-center gap-6">
       <LyingCharacter className="sm:hidden" />
-      <p className="text-muted-foreground">Coming Soon.</p>
+      <p className="text-muted-foreground">Coming Soon</p>
     </div>
   );
 }
