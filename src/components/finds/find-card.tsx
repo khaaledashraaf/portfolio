@@ -87,17 +87,13 @@ export function GlareOverlay({ hovering }: { hovering: boolean }) {
 }
 
 function FindImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  if (src.toLowerCase().endsWith(".gif")) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={src} alt={alt} className={cn("absolute inset-0 h-full w-full object-cover", className)} />
-    );
-  }
+  const isGif = src.toLowerCase().endsWith(".gif");
   return (
     <Image
       src={src}
       alt={alt}
       fill
+      unoptimized={isGif}
       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
       className={cn("object-cover transition-transform duration-500", className)}
     />
