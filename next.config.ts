@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
       { hostname: "cdn.sanity.io" },
       { hostname: "www.idsa.org" },
       { hostname: "encrypted-tbn0.gstatic.com" },
+      { hostname: "media1.tenor.com" },
+      { hostname: "media.tenor.com" },
     ],
   },
 };

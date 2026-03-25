@@ -86,6 +86,20 @@ export function GlareOverlay({ hovering }: { hovering: boolean }) {
   );
 }
 
+function FindImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  const isGif = src.toLowerCase().endsWith(".gif");
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      unoptimized={isGif}
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      className={cn("object-cover transition-transform duration-500", className)}
+    />
+  );
+}
+
 function extractDomain(url: string): string {
   try {
     return new URL(url).hostname.replace("www.", "");
@@ -268,13 +282,7 @@ function MovieCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
         <div className={cn("relative w-full overflow-hidden", find.priority === 3 ? "aspect-[3/5]" : "aspect-[2/3]")}>
-          <Image
-            src={find.imageUrl}
-            alt={find.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500"
-          />
+          <FindImage src={find.imageUrl} alt={find.title} />
         </div>
       )}
       <div className="p-4">
@@ -313,13 +321,7 @@ function ReelCard({ find, isSelected, onInspect }: { find: Find; isSelected?: bo
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
         <div className="relative aspect-video w-full overflow-hidden">
-          <Image
-            src={find.imageUrl}
-            alt={find.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500"
-          />
+          <FindImage src={find.imageUrl} alt={find.title} />
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/30">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-black">
               <Play className="h-4 w-4 ml-0.5" fill="currentColor" />
@@ -340,13 +342,7 @@ function VideoCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
         <div className="relative aspect-video w-full overflow-hidden">
-          <Image
-            src={find.imageUrl}
-            alt={find.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500"
-          />
+          <FindImage src={find.imageUrl} alt={find.title} />
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/30">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-black">
               <Play className="h-4 w-4 ml-0.5" fill="currentColor" />
@@ -392,13 +388,7 @@ function ArticleCard({ find, isSelected, onInspect }: { find: Find; isSelected?:
       )}
       {!find.coverVideoUrl && find.imageUrl && (
         <div className="relative aspect-video w-full overflow-hidden">
-          <Image
-            src={find.imageUrl}
-            alt={find.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500"
-          />
+          <FindImage src={find.imageUrl} alt={find.title} />
         </div>
       )}
       <div className="p-4">
@@ -445,13 +435,7 @@ function ImageCard({ find, isSelected, onInspect }: { find: Find; isSelected?: b
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
         <div className="relative w-full aspect-square overflow-hidden">
-          <Image
-            src={find.imageUrl}
-            alt={find.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500"
-          />
+          <FindImage src={find.imageUrl} alt={find.title} />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12">
             <h3 className="font-semibold text-white">{find.title}</h3>
             <p className="mt-1 text-sm text-white/80">{find.note}</p>
@@ -468,13 +452,7 @@ function ToolCard({ find, isSelected, onInspect }: { find: Find; isSelected?: bo
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="bg-emerald-100/20 dark:bg-emerald-500/[0.04] overflow-hidden">
       {find.imageUrl && (
         <div className="relative aspect-video w-full overflow-hidden">
-          <Image
-            src={find.imageUrl}
-            alt={find.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500"
-          />
+          <FindImage src={find.imageUrl} alt={find.title} />
         </div>
       )}
       <div className="p-4">
@@ -499,13 +477,7 @@ function PeopleCard({ find, isSelected, onInspect }: { find: Find; isSelected?: 
     <CardWrapper find={find} isSelected={isSelected} onInspect={onInspect} className="overflow-hidden">
       {find.imageUrl && (
         <div className={cn("relative w-full overflow-hidden", find.priority === 3 ? "aspect-[3/2]" : "aspect-video")}>
-          <Image
-            src={find.imageUrl}
-            alt={find.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500"
-          />
+          <FindImage src={find.imageUrl} alt={find.title} />
         </div>
       )}
       <div className="p-4">
