@@ -189,7 +189,7 @@ export const finds: Find[] = [
     sourceUrl: "https://www.imdb.com/title/tt0816692/",
     imageUrl: "https://m.media-amazon.com/images/M/MV5BYzdjMDAxZGItMjI2My00ODA1LTlkNzItOWFjMDU5ZDJlYWY3XkEyXkFqcGc@._V1_.jpg",
     dateAdded: "2026-03-22",
-    priority: 2,
+    priority: 1,
   },
   {
     id: "9",
