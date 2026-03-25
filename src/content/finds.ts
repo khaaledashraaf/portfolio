@@ -46,6 +46,17 @@ export type FindItem = Find | FindCollection;
 
 export const finds: Find[] = [
   {
+    id: "11",
+    title: "Where Did These Weird 3D GIFs Come From?",
+    type: "video",
+    note: "An interesting and fun video essay about the origin of widely used 3D animations in the early 2000s era: AnimationFactory.com",
+    sourceUrl: "https://youtu.be/choF4hqrbz4?si=MjQgyR3V4yo0oLJZ",
+    imageUrl: "https://media1.tenor.com/m/MwmW7wupyBgAAAAC/court-jester-dancing.gif",
+    dateAdded: "2026-03-25",
+    author: "lugalan",
+    priority: 1,
+  },
+  {
     id: "10",
     title: "DONKS",
     type: "video",
