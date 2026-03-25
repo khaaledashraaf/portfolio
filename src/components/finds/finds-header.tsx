@@ -33,7 +33,7 @@ export function FindsHeader() {
         <p className="text-muted-foreground">
           A gallery of things found online that I think are worth sharing.
         </p>
-        <SubmitFindButton />
+        {/* <SubmitFindButton /> */}
       </motion.div>
     </motion.div>
   );
