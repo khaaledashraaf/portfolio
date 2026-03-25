@@ -129,7 +129,7 @@ export const finds: Find[] = [
       {
         type: "image",
         src: "https://pbs.twimg.com/media/DvrzYndXcAAgmnA.jpg",
-        caption: "Kare's pixel art portraits",
+        caption: "Solitaire game",
         rotate: -3,
       },
       {

@@ -24,7 +24,7 @@ export default function SusanKareContent() {
       <div className="rounded-xl overflow-hidden">
         <Image
           src="https://pbs.twimg.com/media/DvrzYndXcAAgmnA.jpg"
-          alt="Susan Kare pixel art"
+          alt="The original solitaire game"
           width={1200}
           height={800}
           className="w-full h-auto"
