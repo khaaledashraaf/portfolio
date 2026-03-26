@@ -14,12 +14,30 @@ export default function Home() {
             name: "Khaled Ashraf",
             jobTitle: "Product Designer",
             url: "https://khaledashraf.me",
+            image: "https://khaledashraf.me/image.jpg",
             sameAs: [
               "https://github.com/khaaledashraaf",
               "https://www.linkedin.com/in/khaledaelmaleh/",
             ],
+            worksFor: {
+              "@type": "Organization",
+              name: "noon",
+              url: "https://noon.com",
+            },
+            knowsAbout: [
+              "Product Design",
+              "UX/UI Design",
+              "User Research",
+              "Design Engineering",
+              "Computer Engineering",
+              "Design Systems",
+              "Frontend Development",
+              "Vibe Coding",
+              "Claude Code",
+              "Cursor",
+            ],
             description:
-              "Product Designer with a background in Computer Engineering. Building at the intersection of design tools and code.",
+              "Design Engineer at noon building at the intersection of design tools and code.",
           }),
         }}
       />

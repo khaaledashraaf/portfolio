@@ -15,17 +15,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: BASE_URL,
-      lastModified: new Date(),
+      lastModified: new Date("2026-03-26"),
+      changeFrequency: "monthly",
       priority: 1.0,
     },
     {
       url: `${BASE_URL}/about`,
-      lastModified: new Date(),
+      lastModified: new Date("2026-03-06"),
+      changeFrequency: "yearly",
       priority: 0.8,
     },
     {
       url: `${BASE_URL}/finds`,
       lastModified: new Date(),
+      changeFrequency: "weekly",
       priority: 0.8,
     },
     ...blogEntries,
