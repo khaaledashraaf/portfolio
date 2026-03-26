@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "draftId": "draft-1774483865593",
+    "draftSavedAt": "2026-03-26T00:11:05.593Z",
+    "find": {
+      "id": "find-1774483734878",
+      "title": "Craighill",
+      "type": "tool",
+      "note": "Design studio making everyday carry objects that actually last—their approach to intentional, durable goods is a nice antidote to disposable consumer culture.",
+      "sourceUrl": "https://craighill.co/",
+      "imageUrl": "https://thesilverroom.com/cdn/shop/collections/Craighill_Logo_1_grande.jpg?v=1755176648",
+      "author": "",
+      "priority": 2,
+      "dateAdded": "2026-03-26",
+      "featured": false
+    }
+  }
+]
