@@ -1,14 +1,6 @@
 import { NextResponse } from "next/server";
-import { Octokit } from "octokit";
-import {
-  validateAuth,
-  unauthorized,
-  buildFindEntry,
-  insertFindIntoFile,
-  getNextId,
-} from "../helpers";
-
-const FILE_PATH = "src/content/finds.ts";
+import { createAdminClient } from "@/lib/supabase";
+import { validateAuth, unauthorized } from "../helpers";
 
 export async function POST(request: Request) {
   if (!validateAuth(request)) return unauthorized();
@@ -22,44 +14,37 @@ export async function POST(request: Request) {
       );
     }
 
-    const octokit = new Octokit({ auth: process.env.GITHUB_PAT });
-    const owner = process.env.GITHUB_REPO_OWNER!;
-    const repo = process.env.GITHUB_REPO_NAME!;
+    const supabase = createAdminClient();
 
-    // Get current file
-    const { data: file } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
-      path: FILE_PATH,
-    });
+    // Get next numeric ID
+    const { data: existing } = await supabase.from("finds").select("id");
+    const maxId = (existing ?? []).reduce((max, f) => {
+      const num = parseInt(f.id, 10);
+      return isNaN(num) ? max : Math.max(max, num);
+    }, 0);
+    const nextId = String(maxId + 1);
 
-    if (Array.isArray(file) || file.type !== "file") {
-      return NextResponse.json(
-        { error: "Unexpected file response" },
-        { status: 500 }
-      );
-    }
-
-    const content = Buffer.from(file.content, "base64").toString("utf-8");
-    const nextId = getNextId(content);
-
-    const entryString = buildFindEntry({
-      ...find,
+    const { error } = await supabase.from("finds").insert({
       id: nextId,
-      dateAdded: find.dateAdded || new Date().toISOString().split("T")[0],
+      title: find.title,
+      type: find.type,
+      note: find.note,
+      source_url: find.sourceUrl || null,
+      image_url: find.imageUrl || null,
+      date_added: find.dateAdded || new Date().toISOString().split("T")[0],
+      author: find.author || null,
+      excerpt: find.excerpt || null,
+      cover_video_url: find.coverVideoUrl || null,
+      priority: find.priority || 1,
+      featured: find.featured || false,
+      expandable: find.expandable || false,
+      sticker: find.sticker || null,
+      expanded_note: find.expandedNote || null,
+      expanded_cards: find.expandedCards || null,
+      submitted_by: find.submittedBy || null,
     });
 
-    const updatedContent = insertFindIntoFile(content, entryString, nextId);
-
-    // Commit the updated file
-    await octokit.rest.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path: FILE_PATH,
-      message: `Add find: ${find.title}`,
-      content: Buffer.from(updatedContent).toString("base64"),
-      sha: file.sha,
-    });
+    if (error) throw error;
 
     return NextResponse.json({ success: true, id: nextId });
   } catch (error) {

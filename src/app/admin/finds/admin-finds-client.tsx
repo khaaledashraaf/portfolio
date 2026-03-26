@@ -426,7 +426,7 @@ function AdminFindsInner() {
         setDrafts((prev) => prev.filter((d) => d.draftId !== currentDraftId));
         setCurrentDraftId(null);
       }
-      setStatus({ type: "success", message: `Saved! (ID: ${data.id}) Site will rebuild shortly.` });
+      setStatus({ type: "success", message: `Saved! (ID: ${data.id})` });
       setFind(null);
       setUrl("");
       setStep("url");

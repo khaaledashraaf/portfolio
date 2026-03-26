@@ -3,6 +3,8 @@ import { getAllFindItems, getAllFindTypes } from "@/lib/finds";
 import { FindsHeader } from "@/components/finds/finds-header";
 import { FindsGrid } from "@/components/finds/finds-grid";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Internet Finds",
   description:
@@ -10,9 +12,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://khaledashraf.me/finds" },
 };
 
-export default function FindsPage() {
-  const items = getAllFindItems();
-  const types = getAllFindTypes();
+export default async function FindsPage() {
+  const [items, types] = await Promise.all([getAllFindItems(), getAllFindTypes()]);
 
   return (
     <div className="flex flex-col gap-8 pt-16 sm:pt-24 mb-48 w-full">
