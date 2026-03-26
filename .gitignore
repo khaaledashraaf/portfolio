@@ -26,6 +26,8 @@
 /.claude/
 /.cursor/
 /performance/
+/ACTION-PLAN.md
+/FULL-AUDIT-REPORT.md
 
 # debug
 npm-debug.log*
