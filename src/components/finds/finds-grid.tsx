@@ -132,9 +132,9 @@ function CollectionListItem({
           </h3>
           <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">{collection.note}</p>
         </div>
-        <div className="text-xs text-muted-foreground/60 shrink-0 mt-1 text-right">
-          <div>Collection</div>
-          <div>{collection.items.length} items</div>
+        <div className="text-xs shrink-0 mt-1 text-right">
+          <div className="text-muted-foreground/60">Collection</div>
+          <div className="text-muted-foreground/40">{collection.items.length} items</div>
         </div>
       </button>
       <AnimatePresence>
