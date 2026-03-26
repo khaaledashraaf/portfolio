@@ -333,7 +333,7 @@ function AdminFindsInner() {
   }, [searchParams]);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("finds-token");
+    const saved = localStorage.getItem("finds-token");
     if (saved) setToken(saved);
   }, []);
 
@@ -354,7 +354,7 @@ function AdminFindsInner() {
   }, []);
 
   function handleLogin() {
-    sessionStorage.setItem("finds-token", password);
+    localStorage.setItem("finds-token", password);
     setToken(password);
   }
 
@@ -525,7 +525,7 @@ function AdminFindsInner() {
             <h1 className="text-xl font-semibold">Add Find</h1>
             <button
               onClick={() => {
-                sessionStorage.removeItem("finds-token");
+                localStorage.removeItem("finds-token");
                 setToken(null);
               }}
               className="text-sm text-muted-foreground"
