@@ -58,6 +58,13 @@ export const metadata: Metadata = {
   },
 };
 
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Khaled Ashraf",
+  "url": "https://khaledashraf.me",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -78,6 +85,10 @@ export default function RootLayout({
             <SiteChrome>{children}</SiteChrome>
           </LoadingProvider>
         </ThemeProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <GoogleAnalytics gaId="G-LCV0P4FHDY" />
         <Analytics />
         <SpeedInsights />
