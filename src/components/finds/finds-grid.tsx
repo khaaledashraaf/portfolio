@@ -127,19 +127,15 @@ function CollectionListItem({
       >
         <Layers className="h-4 w-4 mt-1 shrink-0 text-muted-foreground" />
         <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-2">
-            <h3 className="font-semibold text-foreground group-hover:underline truncate">
-              {collection.title}
-            </h3>
-            <span className="text-sm text-muted-foreground shrink-0">
-              {collection.items.length} items
-            </span>
-          </div>
+          <h3 className="font-semibold text-foreground group-hover:underline truncate">
+            {collection.title}
+          </h3>
           <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">{collection.note}</p>
         </div>
-        <span className="text-xs text-muted-foreground/60 shrink-0 mt-1">
-          Collection
-        </span>
+        <div className="text-xs text-muted-foreground/60 shrink-0 mt-1 text-right">
+          <div>Collection</div>
+          <div>{collection.items.length} items</div>
+        </div>
       </button>
       <AnimatePresence>
         {isExpanded && (
