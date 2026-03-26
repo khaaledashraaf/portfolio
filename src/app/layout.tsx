@@ -63,6 +63,13 @@ const websiteJsonLd = {
   "@type": "WebSite",
   "name": "Khaled Ashraf",
   "url": "https://khaledashraf.me",
+  "description":
+    "Product Designer with a background in Computer Engineering. Building at the intersection of design tools and code.",
+  "author": {
+    "@type": "Person",
+    "name": "Khaled Ashraf",
+    "url": "https://khaledashraf.me",
+  },
 };
 
 export default function RootLayout({
