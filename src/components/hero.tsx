@@ -3,14 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { EmailCTA } from "@/components/email-cta";
 
 const currentTools = [
-  { label: "Figma", color: "bg-[#a259ff]/10 text-[#a259ff] hover:bg-[#a259ff]/20" },
-  { label: "Figma MCP", color: "bg-[#a259ff]/10 text-[#a259ff] hover:bg-[#a259ff]/20" },
-  { label: "Claude Code", color: "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20" },
-  { label: "Cursor", color: "bg-foreground/10 text-foreground hover:bg-foreground/20" },
-  { label: "Next.js", color: "bg-foreground/10 text-foreground hover:bg-foreground/20" },
-  { label: "Tailwind", color: "bg-cyan-500/10 text-cyan-600 hover:bg-cyan-500/20" },
-  { label: "Framer Motion", color: "bg-pink-500/10 text-pink-500 hover:bg-pink-500/20" },
-  { label: "Lottie", color: "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20" },
+  { label: "Figma", color: "bg-[#a259ff]/10 text-[#a259ff] hover:bg-[#a259ff]/20", href: "https://figma.com" },
+  { label: "Figma MCP", color: "bg-[#a259ff]/10 text-[#a259ff] hover:bg-[#a259ff]/20", href: "https://www.figma.com/mcp-catalog/" },
+  { label: "Claude Code", color: "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20", href: "https://claude.ai" },
+  { label: "Cursor", color: "bg-foreground/10 text-foreground hover:bg-foreground/20", href: "https://cursor.com" },
+  { label: "Next.js", color: "bg-foreground/10 text-foreground hover:bg-foreground/20", href: "https://nextjs.org" },
+  { label: "Tailwind", color: "bg-cyan-500/10 text-cyan-600 hover:bg-cyan-500/20", href: "https://tailwindcss.com" },
+  { label: "Framer Motion", color: "bg-pink-500/10 text-pink-500 hover:bg-pink-500/20", href: "https://motion.dev" },
+  { label: "Lottie", color: "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20", href: "https://lottiefiles.com" },
 ];
 
 export function Hero() {
@@ -47,9 +47,11 @@ export function Hero() {
         </p>
         <div className="flex flex-wrap justify-center gap-2 max-w-sm">
           {currentTools.map((tool) => (
-            <Badge key={tool.label} variant="secondary" className={tool.color}>
-              {tool.label}
-            </Badge>
+            <a key={tool.label} href={tool.href} target="_blank" rel="noopener noreferrer">
+              <Badge variant="secondary" className={tool.color}>
+                {tool.label}
+              </Badge>
+            </a>
           ))}
         </div>
       </div>
