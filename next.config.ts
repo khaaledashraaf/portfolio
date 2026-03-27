@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
       { hostname: "encrypted-tbn0.gstatic.com" },
       { hostname: "media1.tenor.com" },
       { hostname: "media.tenor.com" },
+      { hostname: "cobalt.tools" },
     ],
   },
 };
