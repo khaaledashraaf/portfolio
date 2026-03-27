@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { hostname: "m.media-amazon.com" },
       { hostname: "img.youtube.com" },
+      { hostname: "i.ytimg.com" },
       { hostname: "upload.wikimedia.org" },
       { hostname: "res.cloudinary.com" },
       { hostname: "storage.icograms.com" },
