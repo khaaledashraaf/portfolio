@@ -9,6 +9,7 @@ export default function SusanKareContent() {
           alt="Happy Mac icon by Susan Kare"
           width={1200}
           height={800}
+          unoptimized
           className="w-full h-auto"
         />
       </div>
@@ -18,6 +19,7 @@ export default function SusanKareContent() {
           alt="Susan Kare's original Macintosh icons"
           width={736}
           height={736}
+          unoptimized
           className="w-full h-auto"
         />
       </div>
@@ -27,6 +29,7 @@ export default function SusanKareContent() {
           alt="The original solitaire game"
           width={1200}
           height={800}
+          unoptimized
           className="w-full h-auto"
         />
       </div>

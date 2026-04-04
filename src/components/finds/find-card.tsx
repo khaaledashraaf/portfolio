@@ -87,13 +87,12 @@ export function GlareOverlay({ hovering }: { hovering: boolean }) {
 }
 
 function FindImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
-  const isGif = src.toLowerCase().endsWith(".gif");
   return (
     <Image
       src={src}
       alt={alt}
       fill
-      unoptimized={isGif}
+      unoptimized
       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
       className={cn("object-cover transition-transform duration-500", className)}
     />

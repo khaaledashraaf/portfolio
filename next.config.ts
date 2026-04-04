@@ -19,26 +19,7 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    remotePatterns: [
-      { hostname: "m.media-amazon.com" },
-      { hostname: "img.youtube.com" },
-      { hostname: "i.ytimg.com" },
-      { hostname: "upload.wikimedia.org" },
-      { hostname: "res.cloudinary.com" },
-      { hostname: "storage.icograms.com" },
-      { hostname: "invention.si.edu" },
-      { hostname: "www.mac-history.net" },
-      { hostname: "cdn.prod.website-files.com" },
-      { hostname: "www.cnet.com" },
-      { hostname: "i.pinimg.com" },
-      { hostname: "pbs.twimg.com" },
-      { hostname: "cdn.sanity.io" },
-      { hostname: "www.idsa.org" },
-      { hostname: "encrypted-tbn0.gstatic.com" },
-      { hostname: "media1.tenor.com" },
-      { hostname: "media.tenor.com" },
-      { hostname: "cobalt.tools" },
-    ],
+    remotePatterns: [],
   },
 };
 

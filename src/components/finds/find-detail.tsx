@@ -33,6 +33,7 @@ function MiniCard({ card }: { card: ExpandedCard }) {
             alt={card.caption}
             width={320}
             height={320}
+            unoptimized
             className="w-full h-auto"
           />
         </div>
