@@ -11,19 +11,37 @@ function isInstagramReelUrl(url: string) {
 }
 
 async function fetchInstagramMetadata(url: string) {
-  const res = await fetch(
-    `https://i.instagram.com/api/v1/oembed/?url=${encodeURIComponent(url)}`,
-    { signal: AbortSignal.timeout(10000) }
-  );
-  if (!res.ok) throw new Error("Instagram oEmbed fetch failed");
-  const data = await res.json();
+  // oEmbed for caption + author, page fetch for OG image (more reliable CDN URLs)
+  const [oembedRes, pageRes] = await Promise.all([
+    fetch(
+      `https://i.instagram.com/api/v1/oembed/?url=${encodeURIComponent(url)}`,
+      { signal: AbortSignal.timeout(10000) }
+    ),
+    fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; FindsBot/1.0)" },
+      signal: AbortSignal.timeout(10000),
+    }).catch(() => null),
+  ]);
+
+  if (!oembedRes.ok) throw new Error("Instagram oEmbed fetch failed");
+  const oembed = await oembedRes.json();
+
+  let ogImage = "";
+  if (pageRes?.ok) {
+    const html = await pageRes.text();
+    const match =
+      html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']*)["']/i) ||
+      html.match(/<meta[^>]*content=["']([^"']*)["'][^>]*property=["']og:image["']/i);
+    ogImage = match?.[1] || "";
+  }
+
   return {
-    title: data.author_name || "",
-    description: data.title || "",
-    image: data.thumbnail_url || "",
+    title: oembed.author_name || "",
+    description: oembed.title || "",
+    image: ogImage || oembed.thumbnail_url || "",
     siteName: "Instagram",
     type: "reel",
-    author: data.author_name || "",
+    author: oembed.author_name || "",
   };
 }
 
