@@ -6,6 +6,27 @@ function isYouTubeUrl(url: string) {
   return /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(url);
 }
 
+function isInstagramReelUrl(url: string) {
+  return /^https?:\/\/(www\.)?instagram\.com\/(reel|reels)\//.test(url);
+}
+
+async function fetchInstagramMetadata(url: string) {
+  const res = await fetch(
+    `https://i.instagram.com/api/v1/oembed/?url=${encodeURIComponent(url)}`,
+    { signal: AbortSignal.timeout(10000) }
+  );
+  if (!res.ok) throw new Error("Instagram oEmbed fetch failed");
+  const data = await res.json();
+  return {
+    title: data.author_name || "",
+    description: data.title || "",
+    image: data.thumbnail_url || "",
+    siteName: "Instagram",
+    type: "reel",
+    author: data.author_name || "",
+  };
+}
+
 async function fetchYouTubeMetadata(url: string) {
   const videoId = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1];
   if (videoId && process.env.YOUTUBE_API_KEY) {
@@ -46,6 +67,7 @@ async function fetchYouTubeMetadata(url: string) {
 
 async function fetchPageMetadata(url: string) {
   if (isYouTubeUrl(url)) return fetchYouTubeMetadata(url);
+  if (isInstagramReelUrl(url)) return fetchInstagramMetadata(url);
 
   try {
     const res = await fetch(url, {
@@ -114,9 +136,9 @@ URL: ${url}
 Page title: ${metadata.title}
 Description: ${metadata.description}
 Site name: ${metadata.siteName}
-OG type: ${metadata.type}
+Content type: ${metadata.type}
 Author: ${metadata.author}
-OG image: ${metadata.image}
+Image: ${metadata.image}
 
 Return a JSON object with these fields:
 - title: Clean, concise title
