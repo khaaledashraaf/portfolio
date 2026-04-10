@@ -11,7 +11,7 @@ import {
   Music, ImageIcon, Sparkles, Wrench, User, SquarePen, Trash2, Plus,
 } from "lucide-react";
 
-type DraftEntry = { draftId: string; draftSavedAt: string; find: Find };
+type DraftEntry = { draftId: string; draftSavedAt: string; find: Find; finds?: Find[] };
 type Step = "dashboard" | "add-url" | "edit" | "preview";
 type DashTab = "published" | "drafts";
 
@@ -231,9 +231,10 @@ function AdminFindsInner() {
 
   // Add/edit flow state
   const [url, setUrl] = useState("");
+  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [committing, setCommitting] = useState(false);
-  const [find, setFind] = useState<Find | null>(null);
+  const [finds, setFinds] = useState<Find[]>([]);
   const [isExistingFind, setIsExistingFind] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [drafts, setDrafts] = useState<DraftEntry[]>([]);
@@ -295,7 +296,7 @@ function AdminFindsInner() {
   }
 
   function editExistingFind(f: Find) {
-    setFind(f);
+    setFinds([f]);
     setIsExistingFind(true);
     setCurrentDraftId(null);
     setStatus(null);
@@ -306,31 +307,31 @@ function AdminFindsInner() {
     if (!url.trim()) return;
     setLoading(true);
     setStatus(null);
-    setFind(null);
+    setFinds([]);
 
     try {
       const res = await fetch("/api/admin/finds/process", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ url: url.trim() }),
+        body: JSON.stringify({ url: url.trim(), notes: notes.trim() || undefined }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to process");
 
-      const f = data.find;
-      setFind({
-        id: `find-${Date.now()}`,
-        title: f.title || "",
-        type: f.type || "other",
-        note: f.note || "",
-        sourceUrl: f.sourceUrl || url.trim(),
-        imageUrl: f.imageUrl || "",
-        author: f.author || "",
-        priority: f.priority || 1,
-        dateAdded: f.dateAdded || new Date().toISOString().split("T")[0],
+      const findsArray = (data.finds || [data.find]).map((f: Record<string, unknown>, i: number) => ({
+        id: `find-${Date.now()}-${i}`,
+        title: (f.title as string) || "",
+        type: (f.type as FindType) || "other",
+        note: (f.note as string) || "",
+        sourceUrl: (f.sourceUrl as string) || (i === 0 ? url.trim() : ""),
+        imageUrl: (f.imageUrl as string) || "",
+        author: (f.author as string) || "",
+        priority: (f.priority as number) || 1,
+        dateAdded: (f.dateAdded as string) || new Date().toISOString().split("T")[0],
         featured: false,
         sticker: undefined,
-      });
+      }));
+      setFinds(findsArray);
       setIsExistingFind(false);
       setStep("edit");
     } catch (err) {
@@ -340,19 +341,21 @@ function AdminFindsInner() {
     }
   }
 
-  async function commitFind() {
-    if (!find) return;
+  async function commitFinds() {
+    if (finds.length === 0) return;
     setCommitting(true);
     setStatus(null);
 
     try {
-      const res = await fetch("/api/admin/finds/commit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ find }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to commit");
+      for (const f of finds) {
+        const res = await fetch("/api/admin/finds/commit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ find: f }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `Failed to commit "${f.title}"`);
+      }
 
       if (currentDraftId) {
         await fetch("/api/admin/finds/drafts", {
@@ -364,8 +367,9 @@ function AdminFindsInner() {
         setCurrentDraftId(null);
       }
 
-      setFind(null);
+      setFinds([]);
       setUrl("");
+      setNotes("");
       setStep("dashboard");
       setDashTab("published");
       loadPublishedFinds();
@@ -377,7 +381,7 @@ function AdminFindsInner() {
   }
 
   async function updateExistingFind() {
-    if (!find) return;
+    if (finds.length === 0) return;
     setCommitting(true);
     setStatus(null);
 
@@ -385,12 +389,12 @@ function AdminFindsInner() {
       const res = await fetch("/api/admin/finds/update", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ find }),
+        body: JSON.stringify({ find: finds[0] }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to update");
 
-      setFind(null);
+      setFinds([]);
       setIsExistingFind(false);
       setStep("dashboard");
       loadPublishedFinds();
@@ -413,19 +417,22 @@ function AdminFindsInner() {
     } catch { /* silently fail */ }
   }
 
-  function updateFindField(field: keyof Find, value: unknown) {
-    if (!find) return;
-    setFind({ ...find, [field]: value });
+  function updateFindField(index: number, field: keyof Find, value: unknown) {
+    setFinds((prev) => prev.map((f, i) => i === index ? { ...f, [field]: value } : f));
+  }
+
+  function removeFind(index: number) {
+    setFinds((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function saveDraft() {
-    if (!find) return;
+    if (finds.length === 0) return;
     setStatus(null);
     try {
       const res = await fetch("/api/admin/finds/drafts", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ find, draftId: currentDraftId }),
+        body: JSON.stringify({ find: finds[0], finds, draftId: currentDraftId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save draft");
@@ -438,7 +445,8 @@ function AdminFindsInner() {
   }
 
   function loadDraft(entry: DraftEntry) {
-    setFind(entry.find);
+    // Support both old single-find drafts and new batch drafts
+    setFinds(entry.finds && entry.finds.length > 0 ? entry.finds : [entry.find]);
     setCurrentDraftId(entry.draftId);
     setIsExistingFind(false);
     setStatus(null);
@@ -494,7 +502,7 @@ function AdminFindsInner() {
           <h1 className="text-base font-semibold">Finds</h1>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => { setIsExistingFind(false); setFind(null); setUrl(""); setCurrentDraftId(null); setStatus(null); setStep("add-url"); }}
+              onClick={() => { setIsExistingFind(false); setFinds([]); setUrl(""); setNotes(""); setCurrentDraftId(null); setStatus(null); setStep("add-url"); }}
               className="flex items-center gap-1.5 rounded-lg bg-foreground px-3 py-1.5 text-sm font-medium text-background"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -659,6 +667,13 @@ function AdminFindsInner() {
               className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base outline-none focus:ring-2 focus:ring-foreground/20"
               autoFocus
             />
+            <textarea
+              placeholder="Notes (optional) — describe what the video covers, mention websites or tools..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-foreground/20 resize-none"
+            />
             <button
               onClick={processUrl} disabled={loading || !url.trim()}
               className="w-full rounded-lg bg-foreground px-4 py-3 text-base font-medium text-background disabled:opacity-50"
@@ -677,50 +692,76 @@ function AdminFindsInner() {
   }
 
   // --- Edit step ---
-  if (step === "edit" && find) {
+  if (step === "edit" && finds.length > 0) {
     return (
       <div style={{ minHeight: "calc(100dvh - 5.5rem)" }} className="flex items-center justify-center p-4">
         <div className="flex w-full flex-col gap-4" style={{ maxWidth: 288 }}>
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold">{isExistingFind ? "Edit Find" : "Edit Card"}</h1>
-            {isExistingFind && <span className="text-xs text-muted-foreground">#{find.id}</span>}
+            <h1 className="text-xl font-bold">
+              {isExistingFind ? "Edit Find" : `Edit ${finds.length > 1 ? `${finds.length} Cards` : "Card"}`}
+            </h1>
+            {isExistingFind && <span className="text-xs text-muted-foreground">#{finds[0].id}</span>}
           </div>
-          <PreviewCard find={find} onUpdate={updateFindField} />
 
-          <div className="flex flex-col gap-3">
-            <label className="flex flex-col gap-1">
-              <span className="text-xs text-muted-foreground">Image URL</span>
-              <input
-                value={find.imageUrl || ""}
-                onChange={(e) => updateFindField("imageUrl", e.target.value)}
-                placeholder="https://..."
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-foreground/20"
-              />
-            </label>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground">Priority</span>
-              <div className="flex gap-1">
-                {([1, 2, 3] as const).map((p) => (
-                  <button
-                    key={p} onClick={() => updateFindField("priority", p)}
-                    className={cn(
-                      "rounded-md px-3 py-1 text-xs font-medium transition-colors",
-                      find.priority === p ? "bg-foreground text-background" : "bg-foreground/5 text-muted-foreground hover:bg-foreground/10"
-                    )}
-                  >
-                    {p}
-                  </button>
-                ))}
+          <div className="flex flex-col gap-6">
+            {finds.map((f, index) => (
+              <div key={f.id} className="flex flex-col gap-3">
+                {finds.length > 1 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {index + 1} of {finds.length}
+                    </span>
+                    <button
+                      onClick={() => removeFind(index)}
+                      className="flex items-center gap-1 text-xs text-red-500/60 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      Remove
+                    </button>
+                  </div>
+                )}
+
+                <PreviewCard find={f} onUpdate={(field, value) => updateFindField(index, field, value)} />
+
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted-foreground">Image URL</span>
+                  <input
+                    value={f.imageUrl || ""}
+                    onChange={(e) => updateFindField(index, "imageUrl", e.target.value)}
+                    placeholder="https://..."
+                    className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-foreground/20"
+                  />
+                </label>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground">Priority</span>
+                  <div className="flex gap-1">
+                    {([1, 2, 3] as const).map((p) => (
+                      <button
+                        key={p} onClick={() => updateFindField(index, "priority", p)}
+                        className={cn(
+                          "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                          f.priority === p ? "bg-foreground text-background" : "bg-foreground/5 text-muted-foreground hover:bg-foreground/10"
+                        )}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox" checked={f.featured || false}
+                    onChange={(e) => updateFindField(index, "featured", e.target.checked)}
+                    className="rounded"
+                  />
+                  <span className="text-xs text-muted-foreground">Featured</span>
+                </label>
+
+                {index < finds.length - 1 && (
+                  <div className="border-t border-border/50 mt-2" />
+                )}
               </div>
-            </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox" checked={find.featured || false}
-                onChange={(e) => updateFindField("featured", e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-xs text-muted-foreground">Featured</span>
-            </label>
+            ))}
           </div>
 
           {status && (
@@ -748,12 +789,18 @@ function AdminFindsInner() {
   }
 
   // --- Preview step ---
-  if (step === "preview" && find) {
+  if (step === "preview" && finds.length > 0) {
     return (
       <div style={{ minHeight: "calc(100dvh - 5.5rem)" }} className="flex items-center justify-center p-4 flex-col gap-4">
         <div className="flex w-full flex-col gap-4" style={{ maxWidth: 288 }}>
-          <h1 className="text-xl font-bold">Preview</h1>
-          <FindCard find={find} />
+          <h1 className="text-xl font-bold">
+            {finds.length > 1 ? `Preview (${finds.length})` : "Preview"}
+          </h1>
+          <div className="flex flex-col gap-4">
+            {finds.map((f) => (
+              <FindCard key={f.id} find={f} />
+            ))}
+          </div>
           {status && (
             <div className={cn("rounded-lg px-4 py-3 text-sm", status.type === "success" ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500")}>
               {status.message}
@@ -764,11 +811,11 @@ function AdminFindsInner() {
               Back
             </button>
             <button
-              onClick={isExistingFind ? updateExistingFind : commitFind}
+              onClick={isExistingFind ? updateExistingFind : commitFinds}
               disabled={committing}
               className="flex-1 rounded-lg bg-foreground px-3 py-2 text-base font-medium text-background disabled:opacity-50"
             >
-              {committing ? "Saving..." : isExistingFind ? "Update" : "Publish"}
+              {committing ? "Saving..." : isExistingFind ? "Update" : `Publish${finds.length > 1 ? ` (${finds.length})` : ""}`}
             </button>
           </div>
         </div>
