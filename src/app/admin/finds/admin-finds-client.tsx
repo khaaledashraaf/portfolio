@@ -1,15 +1,38 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useMemo, Suspense, useRef } from "react";
+import { useState, useEffect, useMemo, Suspense, useRef, useCallback } from "react";
 import Image from "next/image";
 import { FIND_TYPES, type Find, type FindType } from "@/content/finds";
 import { cn } from "@/lib/utils";
 import { FindCard } from "@/components/finds/find-card";
 import {
   Film, BookOpen, Play, MonitorPlay, FileText,
-  Music, ImageIcon, Sparkles, Wrench, User, SquarePen, Trash2, Plus,
+  Music, ImageIcon, Sparkles, Wrench, User, SquarePen, Trash2, Plus, Paperclip, X,
 } from "lucide-react";
+
+type AttachedImage = { file: File; preview: string };
+
+async function compressImage(file: File, maxDim = 1568, quality = 0.8): Promise<Blob> {
+  return new Promise((resolve) => {
+    const img = document.createElement("img");
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext("2d")!.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => resolve(blob!), "image/jpeg", quality);
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
 
 type DraftEntry = { draftId: string; draftSavedAt: string; find: Find; finds?: Find[] };
 type Step = "dashboard" | "add-url" | "edit" | "preview";
@@ -232,6 +255,8 @@ function AdminFindsInner() {
   // Add/edit flow state
   const [url, setUrl] = useState("");
   const [notes, setNotes] = useState("");
+  const [images, setImages] = useState<AttachedImage[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [committing, setCommitting] = useState(false);
   const [finds, setFinds] = useState<Find[]>([]);
@@ -303,17 +328,43 @@ function AdminFindsInner() {
     setStep("edit");
   }
 
+  const handleImageAttach = useCallback((files: FileList | null) => {
+    if (!files) return;
+    const newImages: AttachedImage[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith("image/")) continue;
+      newImages.push({ file, preview: URL.createObjectURL(file) });
+    }
+    setImages((prev) => [...prev, ...newImages].slice(0, 8));
+  }, []);
+
+  function removeImage(index: number) {
+    setImages((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      return prev.filter((_, i) => i !== index);
+    });
+  }
+
   async function processUrl() {
-    if (!url.trim()) return;
+    if (!url.trim() && images.length === 0) return;
     setLoading(true);
     setStatus(null);
     setFinds([]);
 
     try {
+      const formData = new FormData();
+      if (url.trim()) formData.append("url", url.trim());
+      if (notes.trim()) formData.append("notes", notes.trim());
+      for (const img of images) {
+        const compressed = await compressImage(img.file);
+        formData.append("images", compressed, `screenshot-${Date.now()}.jpg`);
+      }
+
       const res = await fetch("/api/admin/finds/process", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ url: url.trim(), notes: notes.trim() || undefined }),
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to process");
@@ -370,6 +421,7 @@ function AdminFindsInner() {
       setFinds([]);
       setUrl("");
       setNotes("");
+      setImages((prev) => { prev.forEach((img) => URL.revokeObjectURL(img.preview)); return []; });
       setStep("dashboard");
       setDashTab("published");
       loadPublishedFinds();
@@ -502,7 +554,7 @@ function AdminFindsInner() {
           <h1 className="text-base font-semibold">Finds</h1>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => { setIsExistingFind(false); setFinds([]); setUrl(""); setNotes(""); setCurrentDraftId(null); setStatus(null); setStep("add-url"); }}
+              onClick={() => { setIsExistingFind(false); setFinds([]); setUrl(""); setNotes(""); setImages((prev) => { prev.forEach((img) => URL.revokeObjectURL(img.preview)); return []; }); setCurrentDraftId(null); setStatus(null); setStep("add-url"); }}
               className="flex items-center gap-1.5 rounded-lg bg-foreground px-3 py-1.5 text-sm font-medium text-background"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -655,7 +707,7 @@ function AdminFindsInner() {
         <div className="flex w-full max-w-sm flex-col gap-4">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold">Add Find</h1>
-            <button onClick={() => setStep("dashboard")} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => { setStep("dashboard"); setImages((prev) => { prev.forEach((img) => URL.revokeObjectURL(img.preview)); return []; }); }} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Cancel
             </button>
           </div>
@@ -667,6 +719,42 @@ function AdminFindsInner() {
               className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base outline-none focus:ring-2 focus:ring-foreground/20"
               autoFocus
             />
+
+            {/* Image attachments */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => { handleImageAttach(e.target.files); e.target.value = ""; }}
+            />
+            {images.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {images.map((img, i) => (
+                  <div key={img.preview} className="relative group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img.preview} alt={`Attachment ${i + 1}`} className="h-16 w-16 rounded-lg object-cover border border-border" />
+                    <button
+                      onClick={() => removeImage(i)}
+                      className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-background text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={images.length >= 8}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30"
+            >
+              <Paperclip className="h-3.5 w-3.5" />
+              {images.length > 0 ? `${images.length}/8 images` : "Attach images"}
+            </button>
+
             <textarea
               placeholder="Notes (optional) — describe what the video covers, mention websites or tools..."
               value={notes}
@@ -675,10 +763,10 @@ function AdminFindsInner() {
               className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-foreground/20 resize-none"
             />
             <button
-              onClick={processUrl} disabled={loading || !url.trim()}
+              onClick={processUrl} disabled={loading || (!url.trim() && images.length === 0)}
               className="w-full rounded-lg bg-foreground px-4 py-3 text-base font-medium text-background disabled:opacity-50"
             >
-              {loading ? "Processing..." : "Process URL"}
+              {loading ? "Processing..." : "Process"}
             </button>
           </div>
           {status && (

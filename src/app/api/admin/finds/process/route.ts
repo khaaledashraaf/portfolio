@@ -133,33 +133,51 @@ export async function POST(request: Request) {
   if (!validateAuth(request)) return unauthorized();
 
   try {
-    const { url, notes } = await request.json();
-    if (!url) {
-      return NextResponse.json({ error: "URL is required" }, { status: 400 });
+    const formData = await request.formData();
+    const url = (formData.get("url") as string)?.trim() || "";
+    const notes = (formData.get("notes") as string)?.trim() || "";
+    const imageFiles = formData.getAll("images") as File[];
+
+    if (!url && imageFiles.length === 0) {
+      return NextResponse.json({ error: "URL or images required" }, { status: 400 });
     }
 
-    const metadata = await fetchPageMetadata(url);
+    // Fetch metadata if URL provided
+    const metadata = url ? await fetchPageMetadata(url) : null;
 
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    // Build Claude message content blocks
+    const contentBlocks: Anthropic.MessageCreateParams["messages"][0]["content"] = [];
 
-    const hasNotes = notes && notes.trim();
+    // Add images first (Claude processes them better before text)
+    for (const file of imageFiles) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const mediaType = file.type as "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+      contentBlocks.push({
+        type: "image",
+        source: { type: "base64", media_type: mediaType, data: buffer.toString("base64") },
+      });
+    }
 
-    const message = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 2048,
-      messages: [
-        {
-          role: "user",
-          content: `You are helping curate an "Internet Finds" collection for a personal portfolio. Given a URL and its metadata, return find entries.
+    // Build text prompt
+    let context = "";
+    if (url && metadata) {
+      context += `URL: ${url}\nPage title: ${metadata.title}\nDescription: ${metadata.description}\nSite name: ${metadata.siteName}\nContent type: ${metadata.type}\nAuthor: ${metadata.author}\nImage: ${metadata.image}\n`;
+    }
+    if (imageFiles.length > 0) {
+      context += `\n${imageFiles.length} screenshot(s) attached — identify the website, tool, or content shown in each.\n`;
+    }
+    if (notes) {
+      context += `\nUser notes: ${notes}\n`;
+    }
 
-URL: ${url}
-Page title: ${metadata.title}
-Description: ${metadata.description}
-Site name: ${metadata.siteName}
-Content type: ${metadata.type}
-Author: ${metadata.author}
-Image: ${metadata.image}${hasNotes ? `\nUser notes: ${notes}` : ""}
+    const hasNotes = !!notes;
+    const hasImages = imageFiles.length > 0;
 
+    contentBlocks.push({
+      type: "text",
+      text: `You are helping curate an "Internet Finds" collection for a personal portfolio. Given the inputs below, return find entries.
+
+${context}
 Each find has these fields:
 - title: Clean, concise title
 - type: One of "movie" | "book" | "reel" | "video" | "poetry" | "article" | "music" | "image" | "tool" | "people" | "other" — use "video" for YouTube/Vimeo full-length videos; use "reel" for Instagram reels, TikToks, and YouTube Shorts
@@ -167,21 +185,24 @@ Each find has these fields:
   - "John Coffey feeling all the pain in the world and still choosing to give it love."
   - "The origin of ASCII art on the internet. Glenn Chappell built it in 1991, and by the 2000s it had 400+ community-made fonts. A little piece of internet history."
   - "The docking scene still gives me chills. A film about love disguised as sci-fi."
-- sourceUrl: The canonical URL for this specific find
-- imageUrl: A representative image URL (use the OG image for the main URL if available, leave empty for others)
+- sourceUrl: The canonical URL for this specific find (use your knowledge to determine the real URL when identified from screenshots)
+- imageUrl: A representative image URL (use the OG image if available, leave empty if unknown)
 - author: The creator/author if applicable (empty string if none)
 - priority: 1, 2, or 3 (1 = minor, 2 = notable, 3 = must-see)
 
-${hasNotes ? `The user notes may mention websites, tools, or resources discussed in this content. For EACH website or tool mentioned (or that you can identify), create a SEPARATE find entry with:
-- Its own title, type, note, and sourceUrl (use the actual website URL, e.g. "https://example.com")
-- The first entry should be for the original URL itself
-- Use your knowledge to determine the correct URLs for mentioned websites/tools
-
-Return a JSON array of find objects.` : "Return a JSON array with a single find object."}
+${hasImages ? "For each screenshot, identify what website/tool/app is shown and create a find entry for it. Use your knowledge to find the real URL." : ""}
+${hasNotes ? `The user notes may mention websites, tools, or resources. For EACH one mentioned, create a SEPARATE find entry with its own title, type, note, and sourceUrl.${url ? " The first entry should be for the original URL itself." : ""}` : ""}
+${!hasImages && !hasNotes ? "Return a JSON array with a single find object." : "Return a JSON array of find objects."}
 
 Return ONLY a valid JSON array, no markdown wrapping, no explanation.`,
-        },
-      ],
+    });
+
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    const message = await anthropic.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 4096,
+      messages: [{ role: "user", content: contentBlocks }],
     });
 
     const raw =
@@ -193,7 +214,7 @@ Return ONLY a valid JSON array, no markdown wrapping, no explanation.`,
     const today = new Date().toISOString().split("T")[0];
     const finds = findsArray.map((f: Record<string, unknown>, i: number) => ({
       ...f,
-      sourceUrl: i === 0 ? url : f.sourceUrl || "",
+      sourceUrl: (i === 0 && url) ? url : f.sourceUrl || "",
       dateAdded: today,
     }));
 
