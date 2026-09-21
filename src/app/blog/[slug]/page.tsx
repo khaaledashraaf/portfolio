@@ -88,7 +88,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         </time>
       </div>
       <div
-        className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:underline prose-a:underline-offset-4 prose-blockquote:border-l-amber-400 prose-blockquote:not-italic prose-blockquote:font-medium prose-blockquote:text-foreground [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none prose-img:mx-auto prose-img:max-w-md [&_p:has(>img)+p]:text-center [&_p:has(>img)+p]:text-sm [&_p:has(>img)+p]:text-muted-foreground"
+        className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:underline prose-a:underline-offset-4 prose-blockquote:border-l-amber-400 prose-blockquote:not-italic prose-blockquote:font-medium prose-blockquote:text-foreground [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none prose-img:mx-auto prose-img:max-w-[min(100%,28rem)] [&_p:has(>img)+p]:text-center [&_p:has(>img)+p]:text-sm [&_p:has(>img)+p]:text-muted-foreground"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
     </article>
