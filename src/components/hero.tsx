@@ -4,13 +4,18 @@ import { EmailCTA } from "@/components/email-cta";
 
 const currentTools = [
   { label: "Figma", color: "bg-[#a259ff]/10 text-[#a259ff] hover:bg-[#a259ff]/20", href: "https://figma.com" },
-  { label: "Figma MCP", color: "bg-[#a259ff]/10 text-[#a259ff] hover:bg-[#a259ff]/20", href: "https://www.figma.com/mcp-catalog/" },
-  { label: "Claude Code", color: "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20", href: "https://claude.ai" },
+  { label: "Claude", color: "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20", href: "https://claude.ai" },
   { label: "Cursor", color: "bg-foreground/10 text-foreground hover:bg-foreground/20", href: "https://cursor.com" },
-  { label: "Next.js", color: "bg-foreground/10 text-foreground hover:bg-foreground/20", href: "https://nextjs.org" },
-  { label: "Tailwind", color: "bg-cyan-500/10 text-cyan-600 hover:bg-cyan-500/20", href: "https://tailwindcss.com" },
-  { label: "Framer Motion", color: "bg-pink-500/10 text-pink-500 hover:bg-pink-500/20", href: "https://motion.dev" },
-  { label: "Lottie", color: "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20", href: "https://lottiefiles.com" },
+  { label: "BigQuery", color: "bg-[#4A8AF4]/10 text-[#2F6BD6] hover:bg-[#4A8AF4]/20", href: "https://cloud.google.com/bigquery" },
+];
+
+// colours borrowed from the page's ASCII scenery: sky, sun, tree, trunk
+const interests = [
+  { label: "Complex problems", color: "bg-red-700/10 text-red-700 dark:text-red-400" },
+  { label: "Full-stack building", color: "bg-sky-500/10 text-sky-600 dark:text-sky-400" },
+  { label: "Working with data", color: "bg-[#4A8AF4]/10 text-[#2F6BD6] dark:text-[#8FB8FF]" },
+  { label: "Simple, beautiful interfaces", color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  { label: "Design that serves the business", color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
 ];
 
 export function Hero() {
@@ -52,6 +57,19 @@ export function Hero() {
                 {tool.label}
               </Badge>
             </a>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center gap-3">
+        <p className="font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Interested in
+        </p>
+        <div className="flex flex-wrap justify-center gap-2 max-w-sm">
+          {interests.map((item) => (
+            <Badge key={item.label} variant="secondary" className={item.color}>
+              {item.label}
+            </Badge>
           ))}
         </div>
       </div>
