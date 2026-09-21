@@ -63,8 +63,8 @@ export function Hero() {
         <p className="font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Interested in
         </p>
-        <div className="flex flex-wrap justify-center gap-2 max-w-sm">
-          {interests.map((item) => (
+        <div className="flex flex-wrap justify-center gap-2 max-w-lg">
+          {interests.map(item) => (
             <Badge key={item.label} variant="secondary" className={item.color}>
               {item.label}
             </Badge>
