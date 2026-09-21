@@ -18,6 +18,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) return {};
 
   const url = `https://khaledashraf.me/blog/${slug}`;
+  const images = post.ogImage
+    ? [{ url: `https://khaledashraf.me${post.ogImage}`, width: 1200, height: 630, alt: post.title }]
+    : undefined;
 
   return {
     title: post.title,
@@ -31,11 +34,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url,
       type: "article",
       publishedTime: post.date,
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.description,
+      images,
     },
   };
 }
@@ -83,7 +88,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         </time>
       </div>
       <div
-        className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:underline prose-a:underline-offset-4"
+        className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:underline prose-a:underline-offset-4 prose-blockquote:border-l-amber-400 prose-blockquote:not-italic prose-blockquote:font-medium prose-blockquote:text-foreground [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none prose-img:mx-auto prose-img:max-w-md [&_p:has(>img)+p]:text-center [&_p:has(>img)+p]:text-sm [&_p:has(>img)+p]:text-muted-foreground"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
     </article>

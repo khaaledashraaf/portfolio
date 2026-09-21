@@ -11,6 +11,7 @@ export interface BlogPost {
   title: string;
   date: string;
   description: string;
+  ogImage?: string;
   content: string;
 }
 
@@ -19,6 +20,9 @@ export interface BlogPostMeta {
   title: string;
   date: string;
   description: string;
+  cover?: string;
+  coverHover?: string;
+  readingTime: number;
 }
 
 export function getAllPosts(): BlogPostMeta[] {
@@ -30,13 +34,16 @@ export function getAllPosts(): BlogPostMeta[] {
     const slug = filename.replace(/\.(mdx|md)$/, "");
     const filePath = path.join(contentDirectory, filename);
     const fileContents = fs.readFileSync(filePath, "utf8");
-    const { data } = matter(fileContents);
+    const { data, content } = matter(fileContents);
 
     return {
       slug,
       title: data.title ?? slug,
       date: data.date ?? "",
       description: data.description ?? "",
+      cover: data.cover,
+      coverHover: data.coverHover,
+      readingTime: Math.max(1, Math.round(content.trim().split(/\s+/).length / 200)),
     };
   });
 
@@ -60,6 +67,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     title: data.title ?? slug,
     date: data.date ?? "",
     description: data.description ?? "",
+    ogImage: data.ogImage,
     content: result.toString(),
   };
 }
