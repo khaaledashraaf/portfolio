@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
     "sarkless-margarette-postmeningeal.ngrok-free.dev",
     "192.168.1.4",
   ],
+  async redirects() {
+    return [{ source: "/projects", destination: "/", permanent: true }];
+  },
   async headers() {
     return [
       {

@@ -12,10 +12,8 @@ const currentTools = [
 // colours borrowed from the page's ASCII scenery: sky, sun, tree, trunk
 const interests = [
   { label: "Complex problems", color: "bg-red-700/10 text-red-700 dark:text-red-400" },
-  { label: "Full-stack building", color: "bg-sky-500/10 text-sky-600 dark:text-sky-400" },
   { label: "Working with data", color: "bg-[#4A8AF4]/10 text-[#2F6BD6] dark:text-[#8FB8FF]" },
-  { label: "Simple, beautiful interfaces", color: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  { label: "Design that serves the business", color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+  { label: "Simple, beautiful interfaces", color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
 ];
 
 export function Hero() {
